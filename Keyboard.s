@@ -124,7 +124,12 @@ STILL_MOVING:#COntinua se movendo se houver o pulo
 
 la t0, Ritcher_damaged
 lb a0, 0(t0)
-bnez a0, FINISH_KEY2	#Se damaged, fica imovel				
+bnez a0, FINISH_KEY2	#Se damaged, fica imovel	
+la t0, Flash_POWER
+lb a0, 0(t0)
+bnez a0, FINISH_KEY2	#Se flash ativo, fica imovel	
+
+								
 li a0, 0
 li a1, 0
 

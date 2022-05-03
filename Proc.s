@@ -401,7 +401,7 @@ jr s6
 			P1_ENEMIES:
 			li a1, 690
 			li a2, 450
-			call ADD_ZOMBIE
+			call ADD_THORN
 			
 			li a1, 620
 			li a2, 648
@@ -410,26 +410,31 @@ jr s6
 			
 			li a1, 650
 			li a2, 900
-			call ADD_GHOST
+			#call ADD_GHOST
 			
 			li a1, 550
-			li a2, 950
-			#call ADD_ZOMBIE
+			li a2, 970
+			call ADD_SLIME
 			
 			li a1, 600
 			li a2, 450
-			call ADD_GHOST
+			#call ADD_GHOST
 			
 			li a1, 450
 			li a2, 850
-			call ADD_GHOST
+			#call ADD_GHOST
 			jr s6
 			
 			
 			P5_ENEMIES:
-			li a1, 3132
+			li a1, 3300
 			li a2, 347
 			call ADD_ZOMBIE
+		
+			li a1, 629
+			li a2, 360
+			call ADD_KNIGHT
+			
 			jr s6
 			
 			P3_ENEMIES:

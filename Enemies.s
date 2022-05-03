@@ -6,8 +6,13 @@ GHOST_SIZE:	.half 23, 23
 
 ZOMBIE_SIZE:	.half 30, 46
 
-KNIGHT_SIZE:	.half 45, 80
+KNIGHT_SIZE:	.half 50, 80
 
+SHOCKWAVE_SIZE:	.half 15, 48
+
+THORNS_SIZE:	.half 33, 33
+
+SLIME_SIZE:	.half 62, 29
 
 Death_enemy_size:	.half 32, 32
 Heart_size:		.half 17, 17		
@@ -24,10 +29,11 @@ Ritcher_IMUNITY:	.byte 0
 .eqv ZOMBIE_VELOCITY		1
 .eqv ZOMBIE_HP			20
 
-.eqv ZOMBIE_VELOCITY		1
+.eqv KNIGHT_VELOCITY		1
 .eqv KNIGHT_HP			50
+.eqv SHOCKWAVE_VELOCITY		3
 
-
+.eqv SLIME_HP			20
 ###################### ADD_GHOST ###############################
 #	ARGUMENTOS:						#
 #		a1 = posicao x					#
@@ -107,6 +113,84 @@ ret
 
 
 
+###################### ADD_SHOCKWAVE ############################
+#	ARGUMENTOS:						#
+#		s6 = posicao x					#
+#		s7 = posicao y					#
+#		s8 = direçao do ataque				#
+#								#
+#################################################################
+ADD_SHOCKWAVE:
+la t0, QUEUE_ENEMIES 
+add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
+addi t0, t0, 4		#Proxima posicao
+li t3, 201
+sw t3, 0(t0)		#Stance primario = 201
+addi t0, t0, 4		#Proxima posicao
+li t3, 100
+sw t3, 0(t0)		#Vida
+addi t0, t0, 4		#Proxima posicao
+sw s8, 0(t0)		#Armazena posicao x fixa para movimentação
+addi t0, t0, 4		#Proxima posicao
+sw s6, 0(t0)		#Armazena posicao x
+addi t0, t0, 4		#Proxima posicao
+sw s7, 0(t0)		#Armazena posicao y
+addi s10, s10, 20
+j ENEMY_NEXT
+
+
+
+###################### ADD_THORN ################################
+#	ARGUMENTOS:						#
+#		a1 = posicao x					#
+#		a2 = posicao y					#
+#								#
+#								#
+#################################################################
+ADD_THORN:
+la t0, QUEUE_ENEMIES 
+add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
+addi t0, t0, 4		#Proxima posicao
+li t1, 202
+sw t1, 0(t0)		#Stance primario = 202
+addi t0, t0, 4		#Proxima posicao
+li t1, 1000		# "Imortal"
+sw t1, 0(t0)		#Vida
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x fixa para movimentação
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x
+addi t0, t0, 4		#Proxima posicao
+sw a2, 0(t0)		#Armazena posicao y
+addi s10, s10, 20
+ret
+
+
+
+###################### ADD_SLIME ################################
+#	ARGUMENTOS:						#
+#		a1 = posicao x					#
+#		a2 = posicao y					#
+#								#
+#								#
+#################################################################
+ADD_SLIME:
+la t0, QUEUE_ENEMIES 
+add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
+addi t0, t0, 4		#Proxima posicao
+li t1, 203
+sw t1, 0(t0)		#Stance primario = 203
+addi t0, t0, 4		#Proxima posicao
+li t1, SLIME_HP			
+sw t1, 0(t0)		#Vida
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x fixa para movimentação
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x
+addi t0, t0, 4		#Proxima posicao
+sw a2, 0(t0)		#Armazena posicao y
+addi s10, s10, 20
+ret
 
 
 
@@ -143,12 +227,12 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		#posicao mapa x(s3) <= enemy x(t2) and s3 + screen width >= t2 + enemy_width
 		blt t2, s3, NOT_IN_SCREEN
 		addi t3, s3, SCREEN_WIDTH #t3 = s3 + screen width
-		addi t4, t2, 30
+		addi t4, t2, 40
 		blt t3, t4, NOT_IN_SCREEN
 		#posicao mapa y(s4) <= enemy y(t1) and s4 + screen height >= t1 + enemy height
 		blt t1, s4, NOT_IN_SCREEN
 		addi t3, s4, SCREEN_WIDTH #t3 = s4 + screen height
-		addi t4, t1, 30
+		addi t4, t1, 40
 		blt t3, t4, NOT_IN_SCREEN
 		
 		#Calcular posicao no mapa
@@ -168,8 +252,14 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		li t0, 72
 		bge t0, t5, ZOMBIE_HEIGHT
 		
-		li t0, 120
+		li t0, 179
 		bge t0, t5, KNIGHT_HEIGHT
+		
+		li t0, 202
+		bge t0, t5, THORNS_HEIGHT	
+		
+		li t0, 203
+		bge t0, t5, SLIME_HEIGHT
 		
 		li t0, -72
 		bge t5, t0, DEATH_HEIGHT
@@ -203,7 +293,15 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		lh t4, 2(t0)
 		j START_HITBOX_ENEMY 
 		
+		THORNS_HEIGHT:
+		la t0, THORNS_SIZE
+		lh t4, 0(t0)
+		j START_HITBOX_ENEMY 
 		
+		SLIME_HEIGHT:
+		la t0, SLIME_SIZE
+		lh t4, 0(t0)
+		j START_HITBOX_ENEMY 
 		
 		#-----------------------------------------------------------------------
 		START_HITBOX_ENEMY :	
@@ -335,9 +433,15 @@ DAMAGE_BY_ENEMY:
 		li t0, 72
 		bge t0, t5, ZOMBIE_HEIGHT2	
 		
-		li t0, 120
+		li t0, 179
 		bge t0, t5, KNIGHT_HEIGHT2	
-					
+		
+		li t0, 202
+		bge t0, t5, THORNS_HEIGHT2	
+		
+		li t0, 203
+		bge t0, t5, SLIME_HEIGHT2			
+											
 		GHOST_HEIGHT2:
 		la t0, GHOST_SIZE
 		lh t4, 2(t0)
@@ -358,7 +462,18 @@ DAMAGE_BY_ENEMY:
 		la t0, Heart_size
 		lh t4, 2(t0)
 		j DAMAGE_BY_ENEMY_INIT	
-								
+		
+		SLIME_HEIGHT2:
+		la t0, SLIME_SIZE
+		lh t4, 0(t0)
+		j DAMAGE_BY_ENEMY_INIT
+		
+		THORNS_HEIGHT2:
+		la t0, THORNS_SIZE
+		lh t4, 0(t0)
+		j DAMAGE_BY_ENEMY_INIT						
+														
+																										
 DAMAGE_BY_ENEMY_INIT:
 	la	t0, PLAYER_POS	
 	lw 	t3, 4(t0)	
@@ -392,8 +507,14 @@ DAMAGE_BY_ENEMY_INIT:
 		li t0, 72
 		bge t0, t5, ZOMBIE_HEIGHT3	
 		
-		li t0,120
+		li t0,179
 		bge t0, t5, KNIGHT_HEIGHT3	
+		
+		li t0, 202
+		bge t0, t5, THORNS_HEIGHT3	
+		
+		li t0, 203
+		bge t0, t5, SLIME_HEIGHT3	
 						
 		GHOST_HEIGHT3:
 		la t0, GHOST_SIZE
@@ -410,11 +531,20 @@ DAMAGE_BY_ENEMY_INIT:
 		lh t4, 0(t0)
 		j ENEMY_X_DAMAGE_INIT
 		
+		THORNS_HEIGHT3:
+		la t0, THORNS_SIZE
+		lh t4, 0(t0)
+		j ENEMY_X_DAMAGE_INIT
+		
+		SLIME_HEIGHT3:
+		la t0, SLIME_SIZE
+		lh t4, 0(t0)
+		j ENEMY_X_DAMAGE_INIT
+		
 		HEART_HEIGHT3:
 		la t0, Heart_size
 		lh t4, 0(t0)
-		j ENEMY_X_DAMAGE_INIT
-					
+		j ENEMY_X_DAMAGE_INIT						
 		
 	ENEMY_X_DAMAGE_INIT:
 	
@@ -550,6 +680,26 @@ li t0, 102
 bge t0, t5, Knight4
 li t0, 103
 bge t0, t5, Knight5
+
+#Power
+li t0, 109
+bge t0, t5, Knight6
+li t0, 119
+bge t0, t5, Knight7
+li t0, 129
+bge t0, t5, Knight8
+li t0, 159
+bge t0, t5, Knight9
+li t0, 200
+bge t0, t5, Knight10
+li t0, 201
+bge t0, t5, Shockwave
+
+li t0, 202
+bge t0, t5, THORNS
+li t0, 203
+bge t0, t5, SLIME
+
 ret		
 
 
@@ -735,7 +885,6 @@ Zombie7:
 Zombie_behaviour:
 	li t4, 40
 	bge t5, t4, ZOMBIE_ATK
-	
 	la	t0, PLAYER_POS					
 	lw 	t3, 0(t0)	
 	bge	t3, t2, ZOMBIE_LEFT
@@ -776,7 +925,7 @@ Zombie_behaviour:
 	bge	t3, t2, ZOMBIE_LEFT_ATK
 	
 	sub t0, s7, t2			#Posicao inicial - posicao fina
-	li t4, 300			#Distancia maxima da posicao inicial
+	li t4, 200			#Distancia maxima da posicao inicial
 	ble t4, t0, ENEMY_NEXT	
 	sub t3, t2, t3
 	li t4, 130			#Distancia minima para zombie andar para tras
@@ -795,7 +944,7 @@ Zombie_behaviour:
 
 	ZOMBIE_LEFT_ATK:
 	sub t0, t2, s7			#Posicao inicial - posicao final
-	li t4, 300			#Distancia maxima da posicao inicial
+	li t4, 200			#Distancia maxima da posicao inicial
 	ble t4, t0, ENEMY_NEXT	
 	sub t3, t3, t2
 	li t4, 110			#Distancia minima para zombie andar para tras
@@ -888,13 +1037,110 @@ Zombie_behaviour:
 	li	a6, 842
 	li 	a7, 222
 		KNIGHT5_J:
-		li t5, 73		#stance
-		j  Knight_behaviour	
-																																																																																																					
+		li 	t5, 73		#stance
+		j 	Knight_behaviour	
+	
+	
+	Knight6:				
+	la 	a4, KNIGHT_SIZE
+	li  	a6, 9
+	li 	a7, 330
+	la	t0, PLAYER_POS
+	lw 	t3, 0(t0)	
+	bge 	t2, t3,  KNIGHT6_J	#Esta a esquerda ritcher
+	li	a6, 995
+	li 	a7, 330
+		KNIGHT6_J:
+		addi 	t5, t5, 1		#stance
+		j  	Knight_behaviour																																																																																																																																																																																																								
+																																																																																																																																																																																																									
+	Knight7:				
+	la 	a4, KNIGHT_SIZE
+	li  	a6, 70
+	li 	a7, 330
+	la	t0, PLAYER_POS
+	lw 	t3, 0(t0)	
+	bge 	t2, t3,  KNIGHT7_J	#Esta a esquerda ritcher
+	li	a6, 928
+	li 	a7, 330
+		KNIGHT7_J:
+		addi 	t5, t5, 1		#stance
+		j  	Knight_behaviour
+	
+	Knight8:				
+	la 	a4, KNIGHT_SIZE
+	li  	a6, 133
+	li 	a7, 330
+	la	t0, PLAYER_POS
+	lw 	t3, 0(t0)	
+	bge 	t2, t3,  KNIGHT8_J	#Esta a esquerda ritcher
+	li	a6, 874
+	li 	a7, 330
+		KNIGHT8_J:
+		addi 	t5, t5, 1		#stance
+		j  	Knight_behaviour
+		
+	Knight9:				
+	la 	a4, KNIGHT_SIZE
+	li  	a6, 256
+	li 	a7, 330
+	la	t0, PLAYER_POS
+	lw 	t3, 0(t0)	
+	bge 	t2, t3,  KNIGHT9_J	#Esta a esquerda ritcher
+	li	a6, 746
+	li 	a7, 330
+		KNIGHT9_J:
+		addi 	t5, t5, 1		#stance
+		
+		
+		la	t0, PLAYER_POS
+		lw 	t3, 0(t0)	
+		bge 	t2, t3,  KNIGHT9_J2	#Esta a esquerda ritcher
+		
+		mv s6, t2
+		mv s7, t1
+		addi s7, s7, 32		#diferença de altura
+		addi s6, s6, 250
+		mv s8, s6
+		addi s6, s6, -250
+		j SHOCKWAVE?
+		KNIGHT9_J2:
+		mv s6, t2
+		mv s7, t1
+		addi s7, s7, 32		#diferença de altura
+		addi s6, s6,-250
+		mv s8, s6
+		addi s6, s6, 250
+		
+		SHOCKWAVE?:
+		li 	t0, 140
+		beq 	t0, t5, ADD_SHOCKWAVE		#Se igual a 130 cria onda de choque
+		j  	Knight_behaviour			
+				
+																																																																																																																																																																																																																																																																																																														
+	Knight10:				
+	la 	a4, KNIGHT_SIZE
+	li  	a6, 326
+	li 	a7, 330
+	la	t0, PLAYER_POS
+	lw 	t3, 0(t0)	
+	bge 	t2, t3,  KNIGHT10_J	#Esta a esquerda ritcher
+	li	a6, 667
+	li 	a7, 330
+		KNIGHT10_J:
+		addi 	t5, t5, 1		#stance
+		li 	t5, 73		#stance
+		j  	Knight_behaviour																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																					
+		
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																					
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																								
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																											
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																	
 	Knight_behaviour:
 	la	t0, PLAYER_POS					
 	lw 	t3, 0(t0)	
 	bge	t3, t2, KNIGHT_LEFT_ATK
+	
 	
 	sub t0, s7, t2			#Posicao inicial - posicao fina
 	li t4, 150			#Distancia maxima da posicao inicial
@@ -909,7 +1155,10 @@ Zombie_behaviour:
 	li t4, 110			#Distancia minima para zombie andar para tras
 	bge t4, t3, KNIGHT_ATKX
 	li t4, 150			#Distancia maxima para zombie andar para tras
-	bge t3, t4, KNIGHT_ATKZ
+	bge t3, t4, ENEMY_NEXT 
+	li t4, 130			#Distancia minima para zombie andar para tras
+	bge t3, t4, KNIGHT_POWER
+	
 	
 	KNIGHT_ATKZ:
 	
@@ -930,10 +1179,13 @@ Zombie_behaviour:
 	beq t4, t0, KNIGHT_ATKX2
 	ble t4, t0, ENEMY_NEXT	
 	sub t3, t3, t2
-	li t4, 110		#Distancia minima para zombie andar para tras
+	li t4, 110			#Distancia minima para zombie andar para tras
 	bge t4, t3, KNIGHT_ATKX2
 	li t4, 150			#Distancia maxima para zombie andar para tras
-	bge t3, t4, KNIGHT_ATKX
+	bge t3, t4, ENEMY_NEXT
+	li t4, 130			#Distancia minima para zombie andar para tras
+	bge t3, t4, KNIGHT_POWER
+	
 	
 	addi 	t2, t2, -1
 	j ENEMY_NEXT
@@ -941,19 +1193,53 @@ Zombie_behaviour:
 	addi 	t2, t2, 1
 	j ENEMY_NEXT																				
 																														
-																																
-																																		
+	KNIGHT_POWER:
+	li t0, 103
+	bge t0, t5, START_KNIGHT_POWER	
+	j ENEMY_NEXT	
+	START_KNIGHT_POWER:
+	li t5, 	104			#Stance inicial para ataque																													
+	j ENEMY_NEXT																																		
 																																				
 																																						
 																																								
 																																										
-																																												
-																																														
-																																																		
+	Shockwave:																																												
+	la 	a4, SHOCKWAVE_SIZE
+	li  	a6, 500
+	li 	a7, 356
+	#Behavior																																													
+	bge t2, s7, SHOCKWAVE_ESQ
+	#Indo para direita
+	li t0, SHOCKWAVE_VELOCITY
+	add t2, t2, t0
+	bge t2, s7, END_SHOCKWAVE
+	j ENEMY_NEXT	
+	
+	SHOCKWAVE_ESQ:
+	#Indo para a esquerda
+	li t0, SHOCKWAVE_VELOCITY
+	sub t2, t2, t0
+	bge s7, t2, END_SHOCKWAVE
+	j ENEMY_NEXT																																																																																																
 			
-				
+	END_SHOCKWAVE:
+	ret			
 					
-						
+	
+	THORNS: 
+	la 	a4, THORNS_SIZE
+	li  	a6, 235
+	li 	a7, 0				
+	j ENEMY_NEXT										
+																
+	SLIME:																				
+	la 	a4, SLIME_SIZE
+	li  	a6, 291
+	li 	a7, 0																								
+	j ENEMY_NEXT																													
+																																				
+																																														
 								
 DEATH_INIT:
 li t5, -1
