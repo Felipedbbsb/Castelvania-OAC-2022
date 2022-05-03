@@ -414,15 +414,15 @@ jr s6
 			
 			li a1, 550
 			li a2, 970
-			call ADD_SLIME
+			call ADD_BONES
 			
 			li a1, 600
 			li a2, 450
-			#call ADD_GHOST
+			call ADD_BONES
 			
 			li a1, 450
 			li a2, 850
-			#call ADD_GHOST
+			#call ADD_BONES
 			jr s6
 			
 			

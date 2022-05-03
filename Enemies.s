@@ -14,6 +14,8 @@ THORNS_SIZE:	.half 33, 33
 
 SLIME_SIZE:	.half 62, 29
 
+BONES_SIZE:	.half 23, 47
+
 Death_enemy_size:	.half 32, 32
 Heart_size:		.half 17, 17		
 Ritcher_damaged: 	.byte 0	#(se estiver ferido = 1, caso contrario, 0.)
@@ -33,7 +35,9 @@ Ritcher_IMUNITY:	.byte 0
 .eqv KNIGHT_HP			50
 .eqv SHOCKWAVE_VELOCITY		3
 
-.eqv SLIME_HP			20
+.eqv SLIME_HP			60
+
+.eqv BONES_HP			20
 ###################### ADD_GHOST ###############################
 #	ARGUMENTOS:						#
 #		a1 = posicao x					#
@@ -192,6 +196,32 @@ sw a2, 0(t0)		#Armazena posicao y
 addi s10, s10, 20
 ret
 
+###################### ADD_BONES ###############################
+#	ARGUMENTOS:						#
+#		a1 = posicao x					#
+#		a2 = posicao y					#
+#								#
+#								#
+#################################################################
+ADD_BONES:
+la t0, QUEUE_ENEMIES 
+add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
+addi t0, t0, 4		#Proxima posicao
+li t1, 204
+sw t1, 0(t0)		#Stance primario = 204
+addi t0, t0, 4		#Proxima posicao
+li t1, BONES_HP
+sw t1, 0(t0)		#Vida
+addi t0, t0, 4		#Proxima posicao
+addi t1, a1, -150	#Espaço de trajeto, patrulha pixels pra esquerda e dps volta em loop
+sw a1, 0(t0)		#Armazena posicao x fixa para movimentação
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x
+addi t0, t0, 4		#Proxima posicao
+sw a2, 0(t0)		#Armazena posicao y
+addi s10, s10, 20
+ret
+
 
 
 ###################### ENEMIES ##################################
@@ -261,6 +291,9 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		li t0, 203
 		bge t0, t5, SLIME_HEIGHT
 		
+		li t0, 204
+		bge t0, t5, BONES_HEIGHT
+		
 		li t0, -72
 		bge t5, t0, DEATH_HEIGHT
 		
@@ -300,6 +333,11 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		
 		SLIME_HEIGHT:
 		la t0, SLIME_SIZE
+		lh t4, 0(t0)
+		j START_HITBOX_ENEMY 
+		
+		BONES_HEIGHT:
+		la t0, BONES_SIZE
 		lh t4, 0(t0)
 		j START_HITBOX_ENEMY 
 		
@@ -350,7 +388,7 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		la 	t0, Shuriken_HITBOX
 		lw 	t3, 0(t0)
 		ble 	t3, t2, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
-		addi 	s6, t2, 50
+		addi 	s6, t2, 35
 		ble 	s6, t3, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
 		
 		lw	t3, 4(t0)
@@ -366,7 +404,7 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		la 	t0, Shuriken_HITBOX
 		lw	t3, 0(t0)
 		ble 	t2, t3, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
-		addi 	s6, t2, -50
+		addi 	s6, t2, -35
 		ble 	t3, s6, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
 		
 		ble 	t2, t3, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
@@ -441,7 +479,10 @@ DAMAGE_BY_ENEMY:
 		
 		li t0, 203
 		bge t0, t5, SLIME_HEIGHT2			
-											
+		
+		li t0, 204
+		bge t0, t5, BONES_HEIGHT2									
+																													
 		GHOST_HEIGHT2:
 		la t0, GHOST_SIZE
 		lh t4, 2(t0)
@@ -472,7 +513,11 @@ DAMAGE_BY_ENEMY:
 		la t0, THORNS_SIZE
 		lh t4, 0(t0)
 		j DAMAGE_BY_ENEMY_INIT						
-														
+		
+		BONES_HEIGHT2:
+		la t0, BONES_SIZE
+		lh t4, 0(t0)
+		j DAMAGE_BY_ENEMY_INIT																									
 																										
 DAMAGE_BY_ENEMY_INIT:
 	la	t0, PLAYER_POS	
@@ -515,7 +560,10 @@ DAMAGE_BY_ENEMY_INIT:
 		
 		li t0, 203
 		bge t0, t5, SLIME_HEIGHT3	
-						
+		
+		li t0, 204
+		bge t0, t5, BONES_HEIGHT3				
+														
 		GHOST_HEIGHT3:
 		la t0, GHOST_SIZE
 		lh t4, 0(t0)
@@ -544,7 +592,12 @@ DAMAGE_BY_ENEMY_INIT:
 		HEART_HEIGHT3:
 		la t0, Heart_size
 		lh t4, 0(t0)
-		j ENEMY_X_DAMAGE_INIT						
+		j ENEMY_X_DAMAGE_INIT	
+		
+		BONES_HEIGHT3:
+		la t0, BONES_SIZE
+		lh t4, 0(t0)
+		j ENEMY_X_DAMAGE_INIT										
 		
 	ENEMY_X_DAMAGE_INIT:
 	
@@ -700,6 +753,18 @@ bge t0, t5, THORNS
 li t0, 203
 bge t0, t5, SLIME
 
+li t0, 209
+bge t0, t5, Bones0
+li t0, 215
+bge t0, t5, Bones1
+li t0, 221
+bge t0, t5, Bones2
+li t0, 227
+bge t0, t5, Bones3
+li t0, 233
+bge t0, t5, Bones4
+li t0, 234
+bge t0, t5, Bones5
 ret		
 
 
@@ -1103,7 +1168,7 @@ Zombie_behaviour:
 		addi s6, s6, 250
 		mv s8, s6
 		addi s6, s6, -250
-		j SHOCKWAVE?
+		j SHOCKWAVES
 		KNIGHT9_J2:
 		mv s6, t2
 		mv s7, t1
@@ -1112,7 +1177,7 @@ Zombie_behaviour:
 		mv s8, s6
 		addi s6, s6, 250
 		
-		SHOCKWAVE?:
+		SHOCKWAVES:
 		li 	t0, 140
 		beq 	t0, t5, ADD_SHOCKWAVE		#Se igual a 130 cria onda de choque
 		j  	Knight_behaviour			
@@ -1226,21 +1291,110 @@ Zombie_behaviour:
 	END_SHOCKWAVE:
 	ret			
 					
-	
+#----------------------------------------THORNS-----------------------------------------------------	
 	THORNS: 
 	la 	a4, THORNS_SIZE
 	li  	a6, 235
 	li 	a7, 0				
 	j ENEMY_NEXT										
-																
+#----------------------------------------SLIME-----------------------------------------------------																
 	SLIME:																				
 	la 	a4, SLIME_SIZE
 	li  	a6, 291
 	li 	a7, 0																								
 	j ENEMY_NEXT																													
 																																				
-																																														
-								
+#----------------------------------------BONES-----------------------------------------------------	
+	Bones0:
+	la 	a4, BONES_SIZE
+	li  	a6, 269
+	li 	a7, 141
+	
+	bge 	t2, s7,  BONES0_J	#Esta a esquerda
+	li	a6, 0
+	li 	a7, 141
+		BONES0_J:	
+		addi t5, t5, 1																																											
+		j Bones_behaviour
+		
+	Bones1:
+	la 	a4, BONES_SIZE
+	li  	a6, 245
+	li 	a7, 141
+	
+	bge 	t2, s7,  BONES1_J	#Esta a esquerda
+	li	a6, 24
+	li 	a7, 141
+		BONES1_J:	
+		addi t5, t5, 1																																											
+		j Bones_behaviour	
+		
+	Bones2:
+	la 	a4, BONES_SIZE
+	li  	a6, 224
+	li 	a7, 141
+	
+	bge 	t2, s7,  BONES2_J	#Esta a esquerda
+	li	a6, 44
+	li 	a7, 141
+		BONES2_J:	
+		addi t5, t5, 1																																											
+		j Bones_behaviour																																																																																																																																																																																																																																																																																
+	
+	Bones3:
+	la 	a4, BONES_SIZE
+	li  	a6, 202
+	li 	a7, 141
+	
+	bge 	t2, s7,  BONES3_J	#Esta a esquerda
+	li	a6, 68
+	li 	a7, 141
+		BONES3_J:	
+		addi t5, t5, 1																																											
+		j Bones_behaviour	
+		
+	Bones4:
+	la 	a4, BONES_SIZE
+	li  	a6, 176
+	li 	a7, 141
+	
+	bge 	t2, s7,  BONES4_J	#Esta a esquerda
+	li	a6, 92
+	li 	a7, 141
+		BONES4_J:	
+		addi t5, t5, 1																																											
+		j Bones_behaviour																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														
+	
+	Bones5:
+	la 	a4, BONES_SIZE
+	li  	a6, 176
+	li 	a7, 141
+	
+	bge 	t2, s7,  BONES5_J	#Esta a esquerda
+	li	a6, 92
+	li 	a7, 141
+		BONES5_J:	
+		li t5, 204																																										
+		j Bones_behaviour	
+		
+	
+	Bones_behaviour:
+		bge 	t2, s7,  BONES_J	#Esta a esquerda 
+		addi	t2, t2, 1
+		beq 	t2, s7, PATRULHA_DIR
+		j ENEMY_NEXT	
+		BONES_J:
+		addi	t2, t2, -1
+		beq 	t2, s7, PATRULHA_ESQ
+		j ENEMY_NEXT
+			PATRULHA_DIR:
+			addi s7, s7, -150
+			j ENEMY_NEXT	
+	
+			PATRULHA_ESQ:
+			addi s7, s7, 150
+			j ENEMY_NEXT														
+																						
 DEATH_INIT:
 li t5, -1
 
