@@ -58,6 +58,8 @@ PLAYER_SIZE:	.half 30,48	#tamanho do Ritcher
 			
 			call SWITCH_FRAME
 			
+			call MUSIC.SETUP
+			
 MAIN_ENEMIES:		#determina os inimigos na fase	
 			jal s6, Sector_enemies
 			
@@ -71,7 +73,7 @@ MAIN_LOOP:		# O framerate de 60 fps
 			li		t1, 0		# 16ms 
 			bltu		t0, t1, MAIN_LOOP	
 
-
+			#call		MUSIC.PLAY
 			
 
 			call 	KEY	#verifica teclado
@@ -339,11 +341,35 @@ HUD:
 	
 	addi s6, s6, 1
 	j IMPRIME_BARRA_HP																																																																																																																																																																																																																																																																				
+
 																					
+																																										
+DIALOGO_PRINT:
+	li a7, 1024
+	la a0, dialogos
+	li a1, 0											
+	ecall																																																															
+																																																																																				
+	call DIALOGO
+	beq a7, zero, NO_PRINT_CHAT
+	li a1, 0
+	li a2, 0
+	la a3, DIALOGOS_SIZE
+	la a4, Box_size
+	mv a5, s1
+	
+	call PRINT																																																																																																																																																																																																														
+																																																																																																																														
+																																																																																																																																																			
+NO_PRINT_CHAT:																																																																																																																																																																								
+																																																																																																																																																																																													
+																																																																																																																																																																																																																		
+																																																																																																																																																																																																																																							
+																																																																																																																																																																																																																																																																																	
 FIM_MAIN_LOOP:		
 csrr		t0, 3073		# t0 = tempo atual
 sub		t0, t0, s11		# t0 = tempo atual - ultimo frame
-li		t1, 24			#16ms 
+li		t1, 22			#24ms 
 bltu		t0, t1, FIM_MAIN_LOOP
 					
 
@@ -403,3 +429,5 @@ ecall
 .include "Pure_science.s"
 .include "Weapon.s"
 .include "Interface.s"
+.include "Midi.s"
+.include "Chat.s"

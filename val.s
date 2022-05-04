@@ -61,8 +61,9 @@ Enemy_size:			.half 1064, 1044	#sempre fazer x += 1(não sei o porque)
 HITBOX_MAP_SIZE:		.half 4352, 2856
 HITBOX:				.string 		"./Imagens/Map_matriz.bin"
 
-
-
+DIALOGOS_SIZE:			.half 1812, 839
+BOX_SIZE:			.half 295, 79
+dialogos:			.string 		"./Imagens/dialogos.bin"
 
 #MAPAS:
 BACKGROUND:			.byte 0	#(1 para que tem background e 0 que nao tem)

@@ -20,6 +20,7 @@ MORTE_SIZE:	.half 89, 97
 
 ORB_SIZE:	.half 36, 36
 
+Lamar_size:		.half 27, 38
 Death_enemy_size:	.half 32, 32
 Heart_size:		.half 17, 17	
 Calice_size: 		.half 11, 10	
@@ -311,6 +312,30 @@ sw a2, 0(t0)		#Armazena posicao y
 addi s10, s10, 20
 ret
 
+###################### ADD_LAMARZINHO ###############################
+#	ARGUMENTOS:						#
+#		a1 = posicao x					#
+#		a2 = posicao y					#
+#								#
+#								#
+#################################################################
+ADD_LAMARZINHO:
+la t0, QUEUE_ENEMIES 
+add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
+addi t0, t0, 4		#Proxima posicao
+li t1, -75
+sw t1, 0(t0)		#Stance primario ghost = 0
+addi t0, t0, 4		#Proxima posicao
+li t1, 1000
+sw t1, 0(t0)		#Vida ghost = 1000
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x fixa para movimentação
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x
+addi t0, t0, 4		#Proxima posicao
+sw a2, 0(t0)		#Armazena posicao y
+addi s10, s10, 20
+ret
 
 ###################### ENEMIES ##################################
 #	RESULTADO:						#
@@ -896,8 +921,6 @@ bge t0, t5, Bones4
 li t0, 234
 bge t0, t5, Bones5
 
-li t0, 235
-#bge t0, t5, Lamarzinho
 
 
 li t0, 245
@@ -1859,6 +1882,8 @@ li t0, -73
 bge t5, t0, HEART
 li t0, -74
 bge t5, t0, CALICE
+li t0, -75
+bge t5, t0, LAMARZINHO
 ret
 
 Death0:
@@ -1984,6 +2009,34 @@ Death13:
 		beq t3, t0, DROPA_CORACAO
 		ret																											
 
+LAMARZINHO_COLLECT:
+la 	t0, SETOR
+lb	t4, 0(t0)
+li 	t3, 1
+beq 	t4, t3, DIALOGO_P1
+li 	t3, 8
+beq 	t4, t3, DIALOGO_P8
+j 	LAMARZINHO
+
+	DIALOGO_P1:
+	la 	t0, DIALOGO_STANCE
+	li 	t3, 1
+	sh 	t3, 0(t0)	
+	j 	LAMARZINHO
+	
+	DIALOGO_P8:
+	la 	t0, DIALOGO_STANCE
+	li 	t3, 1
+	sh 	t3, 0(t0)	
+	j 	LAMARZINHO
+
+LAMARZINHO:
+	la 	a4, Lamar_size
+	li 	a6, 577
+	li 	a7, 577
+	j	ENEMY_NEXT	
+
+
 CALICE_COLLECT:
 	la 	t0, CALICE_NUM	#Aumenta mana 
 	lb	t1, 0(t0) 
@@ -2013,7 +2066,13 @@ CALICE_COLLECT:
 		la t0, Calice3
 		sb zero, 0(t0)
 		j CALICE
+
 	
+	
+			
+				
+					
+							
 CALICE:
 	la 	a4, Calice_size
 	li 	a6, 614
