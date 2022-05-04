@@ -4,7 +4,7 @@
 
 .data 
 
-#PLAYER_POS:	.word 450, 900	# posicao atual do player/inicial
+
 PLAYER_POS:	.word 3080 , 1555	# posicao atual do player/inicial
 PLAYER_SIZE:	.half 30,48	#tamanho do Ritcher
 
@@ -20,13 +20,7 @@ PLAYER_SIZE:	.half 30,48	#tamanho do Ritcher
 
 
 
-# Open MAPA file	
-			#create stack
-			#addi	sp,sp,-1480
-			#save s10
-			#sw	s10,1480(sp)
-			#update s10
-			#addi	s10,sp,1480	
+
 START:			
 			la		t0, PLAYER_POS
 			flw		fs0, 0(t0)		# fs0 = char x
@@ -63,7 +57,7 @@ MAIN_LOOP:		# O framerate de 60 fps
 			li		t1, 0		# 16ms 
 			bltu		t0, t1, MAIN_LOOP	
 
-			#call		MUSIC.PLAY
+			call		MUSIC.PLAY
 			
 
 			call 	KEY	#verifica teclado
@@ -376,13 +370,7 @@ li		t1, 22			#24ms
 bltu		t0, t1, FIM_MAIN_LOOP
 					
 
-#Confere se zerou o jogo (ultimo dialogo e estar no setor 8)
-la t0, VICTORY
-lb t1, 0(t0)
-beq t1, zero, NOT_THEEND
-j THE_END
 
-NOT_THEEND:
 
 call SWITCH_FRAME		#mostra a nova tela	
 beq s1, zero,FRAME_1
@@ -394,7 +382,13 @@ FRAME_0:
 csrr		s11, 3073	#tempo do primeiro frame
 
 
+#Confere se zerou o jogo (ultimo dialogo e estar no setor 8)
+la t0, VICTORY
+lb t1, 0(t0)
+beq t1, zero, NOT_THEEND
+j THE_END
 
+NOT_THEEND:
 
 
 
@@ -424,6 +418,13 @@ j MAIN_ENEMIES
 
 
 			THE_END:	#Vitoria
+			beq s1, zero,FRAME_1s
+			li s1, 0
+			j FRAME_0
+			FRAME_1s:								
+			li s1, 1
+			FRAME_0s:	
+			
 			li	a7, 1024
 			la	a0, VICTORY_TELA
 			li	a1, 0
@@ -434,28 +435,62 @@ j MAIN_ENEMIES
 			LOOP_VICTORY:
 			li a1, 0
 			li a2, 0
-			li a3, VICTORY_SIZE
-			li a4, SCREEN_SIZE
+			la a3, VICTORY_SIZE
+			la a4, SCREEN_SIZE
 			mv a5, s1
+			li t0, 230
+			bge a6, t0, GG
+			mv a7, a6
+			call PRINT
+			GG:
+			li a7, 240
 			call PRINT
 			
-			li t1, 290
+			li t1, 300
 			beq t1, a6, FINISH
 			addi a6, a6, 1
-			J2:
-			li t1, 237
-			beq t1, a6, J3
-			addi a6, a6, 1
-			J3:
+
+		 	
+			
+			mv t0, a0
+			li a0, 50
+			li a7, 32
+			ecall
+			mv a0, t0
 			
 			j LOOP_VICTORY
 			
-THE_END2:	#Derrota
+			THE_END2:	#Derrota
+			beq s1, zero,FRAME_1ss
+			li s1, 0
+			j FRAME_0
+			FRAME_1ss:								
+			li s1, 1
+			FRAME_0ss:	
+			
+			li	a7, 1024
+			la	a0, GAMEOVER_TELA
+			li	a1, 0
+			ecall
+			li a6, 0
+			li a7, 0
+			li a1, 0
+			li a2, 0
+			la a3, GAMEOVER_SIZE
+			la a4, SCREEN_SIZE
+			mv a5, s1
+			call PRINT
+			li a0, 5000
+			li a7, 32
+			ecall
+			j FINISH
+FINISH:
+mv t0, a0
 li a0, 5000
 li a7, 32
-ecall
+#ecall
 
-FINISH:
+
 li a7, 10
 ecall
 

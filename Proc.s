@@ -379,7 +379,7 @@ li t2, 2
 beq t1, t2, P2_ENEMIES
 
 li t2, 3
-beq t1, t2, P3_ENEMIES
+#beq t1, t2, P3_ENEMIES
 
 li t2, 4
 beq t1, t2, P4_ENEMIES
@@ -388,7 +388,7 @@ li t2, 5
 beq t1, t2, P5_ENEMIES
 
 li t2, 6
-#beq t1, t2, P6_ENEMIES
+beq t1, t2, P6_ENEMIES
 
 li t2, 7
 #beq t1, t2, P7_ENEMIES
@@ -407,17 +407,48 @@ jr s6
 			li a2, 648
 			call ADD_KNIGHT
 			
+			li a1, 382
+			li a2, 30
+			call ADD_GHOST
+			
+			li a1, 500
+			li a2, 100
+			call ADD_GHOST
+			
+			li a1, 400
+			li a2, 200
+			call ADD_GHOST
+			
+			li a1, 300
+			li a2, 300
+			call ADD_GHOST
+			
+			li a1, 70
+			li a2, 70
+			call ADD_GHOST
+			
+			li a1, 70
+			li a2, 900
+			call ADD_GHOST
 			
 			li a1, 650
 			li a2, 900
-			#call ADD_GHOST
+			call ADD_GHOST
 			
 			li a1, 550
 			li a2, 966
-			#call ADD_BONES
+			call ADD_GHOST
 			
 			li a1, 550
 			li a2, 955
+			call ADD_BONES
+			
+			li a1, 860
+			li a2, 279
+			call ADD_BONES
+			
+			li a1, 995
+			li a2, 279
 			call ADD_BONES
 			
 			li a1, 500
@@ -426,11 +457,11 @@ jr s6
 			
 			li a1, 670
 			li a2, 456
-			call ADD_BONES
+			call ADD_GHOST
 			
 			li a1, 450
 			li a2, 850
-			#call ADD_BONES
+			call ADD_GHOST
 			
 			la t0, Calice1
 			lb t1, 0(t0)
@@ -476,6 +507,30 @@ jr s6
 			
 			li a1, 3250
 			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 2382
+			li a2, 30
+			call ADD_GHOST
+			
+			li a1, 2500
+			li a2, 100
+			call ADD_GHOST
+			
+			li a1, 3400
+			li a2, 200
+			call ADD_GHOST
+			
+			li a1, 2300
+			li a2, 300
+			call ADD_GHOST
+			
+			li a1, 2270
+			li a2, 70
+			call ADD_GHOST
+			
+			li a1, 70
+			li a2, 900
 			call ADD_GHOST
 			
 			li a1, 3400
@@ -526,14 +581,115 @@ jr s6
 			
 			
 			
-			P5_ENEMIES:
+			P5_ENEMIES:	
 			li a1, 3300
 			li a2, 347
 			call ADD_ZOMBIE
-		
+					
+			li a1, 3685
+			li a2, 683
+			call ADD_ZOMBIE
+			
+			li a1, 3606
+			li a2, 683
+			call ADD_ZOMBIE
+			
+			li a1, 3672
+			li a2, 683
+			call ADD_ZOMBIE
+			
+			li a1, 3776
+			li a2, 683
+			call ADD_ZOMBIE
+			
+			li a1, 3578
+			li a2, 683
+			call ADD_ZOMBIE
+			
+			
+			li a1, 4089
+			li a2, 183
+			call ADD_THORN
+			
+			li a1, 3746
+			li a2, 177
+			call ADD_SLIME
+			
+			li a1, 3820
+			li a2, 177
+			call ADD_SLIME
+			
+			li a1, 3781
+			li a2,441
+			call ADD_BONES
+			
+			li a1, 3806
+			li a2,441
+			call ADD_BONES
+			
+			li a1, 3756
+			li a2,441
+			call ADD_BONES
+			
+			li a1, 3700
+			li a2,441
+			call ADD_ZOMBIE
+			
+			li a1, 3720
+			li a2,441
+			call ADD_ZOMBIE
+			
+			li a1, 3756
+			li a2,441
+			call ADD_ZOMBIE
+			
+			li a1, 3756
+			li a2,441
+			call ADD_ZOMBIE
+			
+			li a1, 3130
+			li a2, 260
+			call ADD_GHOST
+			
+			li a1, 3170
+			li a2, 260
+			call ADD_GHOST
+			
+			li a1, 3210
+			li a2, 260
+			call ADD_GHOST
+			
+			li a1, 3160
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3100
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3250
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 2382
+			li a2, 30
+			call ADD_GHOST
+			
+			li a1, 2500
+			li a2, 100
+			call ADD_GHOST
+			
+			li a1, 3400
+			li a2, 200
+			call ADD_GHOST
+			
+			li a1, 3250
+			li a2, 260
+			call ADD_GHOST
+			
 			li a1, 629
 			li a2, 360
-			call ADD_KNIGHT
+			call ADD_ZOMBIE
 			
 			la t0, Calice3
 			lb t1, 0(t0)
@@ -545,16 +701,19 @@ jr s6
 	
 			jr s6
 			
-			P3_ENEMIES:
-			li a1, 2800
-			li a2, 1519
-			call ADD_GHOST
-
-			li a1, 2650
-			li a2, 1519
-			call ADD_GHOST
-			jr s6
+			P6_ENEMIES:
+			li a1, 3247
+			li a2, 1850
+			call ADD_BONES
 			
+			li a1, 3370
+			li a2, 1850
+			call ADD_BONES
+			
+			li a1, 3400
+			li a2, 1850
+			call ADD_BONES
+			jr s6
 			P8_ENEMIES:
 			
 			li a1, 3702

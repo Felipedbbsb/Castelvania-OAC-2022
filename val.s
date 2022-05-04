@@ -83,12 +83,14 @@ FILE_MAP_SIZE:			.half 4356, 2860	#sempre fazer x += 1(não sei o porque)
 
 
 VICTORY_TELA:			.string 		"./Imagens/Castlevania_Vitoria.bin"
-VICTORY_SIZE:			.half 641, 480		#sempre fazer x += 1(não sei o porque)
+VICTORY_SIZE:			.half 640, 480		#sempre fazer x += 1(não sei o porque)
 
+GAMEOVER_TELA:			.string 		"./Imagens/gameover.bin"
+GAMEOVER_SIZE:			.half 320, 240		#sempre fazer x += 1(não sei o porque)
 
-VICTORY:			.byte 0 		# 0 = nao zerou, 1 = zerou
+VICTORY:			.byte	0 		# 0 = nao zerou, 1 = zerou
 
-CALICE_NUM: 			.byte	3		#Começa com 0, ritcher precisa coletar 3
+CALICE_NUM: 			.byte	0		#Começa com 0, ritcher precisa coletar 3
 #--------------------setores------------------------------------------------
 SETOR: 				.byte 2
 NEW_SECTOR:			.byte 0
