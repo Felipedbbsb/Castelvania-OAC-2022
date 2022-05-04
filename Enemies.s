@@ -1,6 +1,6 @@
 .data
 Q:		.space 3	
-QUEUE_ENEMIES:	.space 804		#Espaço para 40 enemies -> 20(espaço ocupado por cada um) x 40 = 640
+QUEUE_ENEMIES:	.space 2804		#Espaço para 40 enemies -> 20(espaço ocupado por cada um) x 40 = 640
 
 GHOST_SIZE:	.half 23, 23
 
@@ -50,7 +50,7 @@ Calice3:		.byte	1
 
 .eqv MORTE_HP			100
 
-.eqv ORB_HP			8
+.eqv ORB_HP			1
 ###################### ADD_GHOST ###############################
 #	ARGUMENTOS:						#
 #		a1 = posicao x					#
@@ -1705,7 +1705,7 @@ Zombie_behaviour:
 			addi t2, t2, -3
 			j ENEMY_NEXT
 	MORTE_ATK:
-	li t0, 326
+	li t0, 340
 	beq t0, t5, ATK_ORBS	#Cast de orbs	
 	li t0, 296	#Se maior que 296, continua o valor
 	bge t5, t0, ENEMY_NEXT
@@ -1713,16 +1713,14 @@ Zombie_behaviour:
 	j ENEMY_NEXT																																																																																																																																																																																																																																																																																																																																																																																																																																																			
 	
 	ATK_ORBS:
-	#mv t3, a1 #Guarda valores para funcionamento do procedimento
-	#mv t4, a2
-	
 	mv s8, t2
 	mv s9, t1
-	
+	li t0, 2000
+	bge s10, t0, ENEMY_NEXT #Limite de inimigos na tela
 	jal s6, ADD_ORB	
 	
-	#mv a1, t3 #Retorna valores para funcionamento do procedimento
-	#mv a2, t4	
+	addi s8, s8, 80		#Bola pela outra mao da morte tambem
+	jal s6, ADD_ORB	
 	j ENEMY_NEXT																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						
 	
 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						
@@ -1798,7 +1796,7 @@ Zombie_behaviour:
 	Orb_behaviour:
 	la	t0, PLAYER_POS	
 	lw 	t3, 4(t0)	#se aproxima do y do personagem
-	li 	t4, 1	#Velocidade
+	li 	t4, 1		#Velocidade
 	bge 	t3, t1, ORB_UP	#Esta encima
 	
 	#senao esta abaixo
@@ -2026,9 +2024,11 @@ CALICE:
 HEART_COLLECT:
 	la 	t0, MANA	#Aumenta mana 
 	lb	t1, 0(t0) 
-	li	t2, 15	#maximo
-	beq	t1, t2, NO_MORE_MANA
+	li	t2, 99		#maximo
+	bge	t1, t2, NO_MORE_MANA
 	addi 	t1, t1, 4
+	bge	t2, t1, NO_MORE_MANA
+	li 	t1, 99
 	NO_MORE_MANA:
 	sb 	t1, 0(t0)
 	

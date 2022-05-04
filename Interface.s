@@ -8,7 +8,7 @@ POWER:			.byte 1	#0 = shuriken selecionado, 1 = flash selecionado)
 MANA:			.byte 13
 .text
 .eqv SHURIKEN_COST	3
-.eqv flash_COST		7
+.eqv FLASH_COST		7
 .eqv MANA_PLUS  	4
 
 INTERFACE_HP:

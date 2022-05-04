@@ -1,7 +1,8 @@
 
 .data
 
-
+.eqv SHURIKEN_COST	3
+.eqv FLASH_COST		7
 .eqv ALCANCE_SHURIKEN	60
 .text
 KEY:		
@@ -194,6 +195,14 @@ KEY_E:		beq s8, zero, KEY_F	#se tecla nao esta pressionada vai para proximo
 		bnez t1, POWER_FLASH_ACTIVE #Se diferente de 0 significa que esta habilitado somente o flash, e se for igual, significca q shuriken ta habilitado
 		
 		#---------------------------------------POWER SHURIKEN----------------------------------------		
+		la t0, MANA
+		lb t1, 0(t0)
+		li t2, SHURIKEN_COST	
+		bge t1, t2, SPEND_SHURIKEN
+		j END_POWERS
+		SPEND_SHURIKEN:
+		sub t1, t1, t2
+		sb t1,0(t0)
 		la t0, SHURIKEN_POWER
 		li t1, ALCANCE_SHURIKEN
 		sb t1, 0(t0)
@@ -208,6 +217,14 @@ KEY_E:		beq s8, zero, KEY_F	#se tecla nao esta pressionada vai para proximo
 		j END_POWERS
 		#---------------------------------------POWER FLASH-----------------------------------------		
 		POWER_FLASH_ACTIVE:
+		la t0, MANA
+		lb t1, 0(t0)
+		li t2, FLASH_COST	
+		bge t1, t2, SPEND_FLASH
+		j END_POWERS
+		SPEND_FLASH:
+		sub t1, t1, t2
+		sb t1,0(t0)
 		la t0, Flash_POWER
 		li t1, 1
 		sb t1, 0(t0)

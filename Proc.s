@@ -551,8 +551,8 @@ jr s6
 			jr s6
 			
 			P8_ENEMIES:
-			li a1, 3400
-			li a2, 2098
+			li a1, 3375
+			li a2, 2050
 			call ADD_MORTE
 			
 			jr s6

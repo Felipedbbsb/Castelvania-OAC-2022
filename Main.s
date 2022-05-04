@@ -343,7 +343,7 @@ HUD:
 FIM_MAIN_LOOP:		
 csrr		t0, 3073		# t0 = tempo atual
 sub		t0, t0, s11		# t0 = tempo atual - ultimo frame
-li		t1, 24#16ms 
+li		t1, 24			#16ms 
 bltu		t0, t1, FIM_MAIN_LOOP
 					
 
