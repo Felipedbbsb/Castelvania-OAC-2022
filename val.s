@@ -77,11 +77,13 @@ Pocket_size:			.half 3344, 620
 
 
 #Library
-Map:			.string 		"./Imagens/MAPA.bin"
+Map:				.string 		"./Imagens/MAPA.bin"
 FILE_MAP_SIZE:			.half 4356, 2860	#sempre fazer x += 1(não sei o porque)
 
+
+CALICE_NUM: 			.byte	0		#Começa com 0, ritcher precisa coletar 3
 #--------------------setores------------------------------------------------
-SETOR: 				.byte 1
+SETOR: 				.byte 8
 NEW_SECTOR:			.byte 0
 
 NEW_PLAYER_POS:			.word 380, 900	# posicao nova para proximo loop caso haja transicao

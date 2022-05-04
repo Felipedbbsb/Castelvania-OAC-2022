@@ -4,8 +4,8 @@
 
 .data 
 
-PLAYER_POS:	.word 450, 900	# posicao atual do player/inicial
-#PLAYER_POS:	.word 3200 , 1562	# posicao atual do player/inicial
+#PLAYER_POS:	.word 450, 900	# posicao atual do player/inicial
+PLAYER_POS:	.word 3200 , 2800	# posicao atual do player/inicial
 PLAYER_SIZE:	.half 30,48	#tamanho do Ritcher
 
 

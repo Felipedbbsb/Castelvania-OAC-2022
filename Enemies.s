@@ -16,8 +16,13 @@ SLIME_SIZE:	.half 62, 29
 
 BONES_SIZE:	.half 23, 47
 
+MORTE_SIZE:	.half 89, 92
+
+
+
 Death_enemy_size:	.half 32, 32
-Heart_size:		.half 17, 17		
+Heart_size:		.half 17, 17	
+Calice_size: 	.half 11, 10	
 Ritcher_damaged: 	.byte 0	#(se estiver ferido = 1, caso contrario, 0.)
 Ritcher_IMUNITY:	.byte 0
 
@@ -38,6 +43,8 @@ Ritcher_IMUNITY:	.byte 0
 .eqv SLIME_HP			60
 
 .eqv BONES_HP			20
+
+.eqv MORTE_HP			20
 ###################### ADD_GHOST ###############################
 #	ARGUMENTOS:						#
 #		a1 = posicao x					#
@@ -131,7 +138,7 @@ addi t0, t0, 4		#Proxima posicao
 li t3, 201
 sw t3, 0(t0)		#Stance primario = 201
 addi t0, t0, 4		#Proxima posicao
-li t3, 100
+li t3, 10
 sw t3, 0(t0)		#Vida
 addi t0, t0, 4		#Proxima posicao
 sw s8, 0(t0)		#Armazena posicao x fixa para movimentação
@@ -222,6 +229,56 @@ sw a2, 0(t0)		#Armazena posicao y
 addi s10, s10, 20
 ret
 
+###################### ADD_MORTE ###############################
+#	ARGUMENTOS:						#
+#		a1 = posicao x					#
+#		a2 = posicao y					#
+#								#
+#								#
+#################################################################
+ADD_MORTE:
+la t0, QUEUE_ENEMIES 
+add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
+addi t0, t0, 4		#Proxima posicao
+li t1, 235
+sw t1, 0(t0)		#Stance primario = 235
+addi t0, t0, 4		#Proxima posicao
+li t1, MORTE_HP
+sw t1, 0(t0)		#Vida
+addi t0, t0, 4		#Proxima posicao
+#addi t1, a1, -150	#Espaço de trajeto, patrulha pixels pra esquerda e dps volta em loop
+sw a1, 0(t0)		#Armazena posicao x fixa para movimentação
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x
+addi t0, t0, 4		#Proxima posicao
+sw a2, 0(t0)		#Armazena posicao y
+addi s10, s10, 20
+ret
+
+###################### ADD_CALICE ###############################
+#	ARGUMENTOS:						#
+#		a1 = posicao x					#
+#		a2 = posicao y					#
+#								#
+#								#
+#################################################################
+ADD_CALICE:
+la t0, QUEUE_ENEMIES 
+add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
+addi t0, t0, 4		#Proxima posicao
+li t1, -74
+sw t1, 0(t0)		#Stance primario = 235
+addi t0, t0, 4		#Proxima posicao
+li t1, 1000		#Imortal
+sw t1, 0(t0)		#Vida
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x fixa para movimentação
+addi t0, t0, 4		#Proxima posicao
+sw a1, 0(t0)		#Armazena posicao x
+addi t0, t0, 4		#Proxima posicao
+sw a2, 0(t0)		#Armazena posicao y
+addi s10, s10, 20
+ret
 
 
 ###################### ENEMIES ##################################
@@ -294,6 +351,9 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		li t0, 204
 		bge t0, t5, BONES_HEIGHT
 		
+		li t0, 235
+		bge t0, t5, MORTE_HEIGHT
+		
 		li t0, -72
 		bge t5, t0, DEATH_HEIGHT
 		
@@ -341,6 +401,10 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		lh t4, 0(t0)
 		j START_HITBOX_ENEMY 
 		
+		MORTE_HEIGHT:
+		la t0, MORTE_SIZE
+		lh t4, 0(t0)
+		j START_HITBOX_ENEMY 
 		#-----------------------------------------------------------------------
 		START_HITBOX_ENEMY :	
 		la	t0, PLAYER_POS
@@ -482,7 +546,10 @@ DAMAGE_BY_ENEMY:
 		
 		li t0, 204
 		bge t0, t5, BONES_HEIGHT2									
-																													
+		
+		li t0, 235
+		bge t0, t5, MORTE_HEIGHT2
+																																																																																																														
 		GHOST_HEIGHT2:
 		la t0, GHOST_SIZE
 		lh t4, 2(t0)
@@ -518,7 +585,12 @@ DAMAGE_BY_ENEMY:
 		la t0, BONES_SIZE
 		lh t4, 0(t0)
 		j DAMAGE_BY_ENEMY_INIT																									
-																										
+		
+		MORTE_HEIGHT2:
+		la t0, MORTE_SIZE
+		lh t4, 0(t0)
+		j DAMAGE_BY_ENEMY_INIT							
+																																															
 DAMAGE_BY_ENEMY_INIT:
 	la	t0, PLAYER_POS	
 	lw 	t3, 4(t0)	
@@ -563,7 +635,10 @@ DAMAGE_BY_ENEMY_INIT:
 		
 		li t0, 204
 		bge t0, t5, BONES_HEIGHT3				
-														
+		
+		li t0, 235
+		bge t0, t5, MORTE_HEIGHT3												
+																																						
 		GHOST_HEIGHT3:
 		la t0, GHOST_SIZE
 		lh t4, 0(t0)
@@ -597,7 +672,12 @@ DAMAGE_BY_ENEMY_INIT:
 		BONES_HEIGHT3:
 		la t0, BONES_SIZE
 		lh t4, 0(t0)
-		j ENEMY_X_DAMAGE_INIT										
+		j ENEMY_X_DAMAGE_INIT		
+		
+		MORTE_HEIGHT3:
+		la t0, MORTE_SIZE
+		lh t4, 0(t0)
+		j ENEMY_X_DAMAGE_INIT																	
 		
 	ENEMY_X_DAMAGE_INIT:
 	
@@ -624,6 +704,8 @@ DAMAGE_BY_ENEMY_INIT:
 DAMAGED_BY_ENEMY_RIGHT:	
 li t0, -71
 beq t0, t5, HEART_COLLECT
+li t0, -74
+beq t0, t5, CALICE_COLLECT
 li t4, -1
 bge t4, t5, DEATH_ENEMY
 
@@ -648,6 +730,8 @@ j IMUNITY
 DAMAGED_BY_ENEMY_LEFT:
 li t0, -71
 beq t0, t5, HEART_COLLECT
+li t0, -74
+beq t0, t5, CALICE_COLLECT
 li t4, -1
 bge t4, t5, DEATH_ENEMY
 
@@ -765,6 +849,21 @@ li t0, 233
 bge t0, t5, Bones4
 li t0, 234
 bge t0, t5, Bones5
+
+li t0, 240
+bge t0, t5, Morte0
+li t0, 244
+bge t0, t5, Morte1
+li t0, 248
+bge t0, t5, Morte2
+li t0, 252
+bge t0, t5, Morte3
+li t0, 256
+bge t0, t5, Morte4
+li t0, 260
+bge t0, t5, Morte5
+li t0, 261
+bge t0, t5, Morte6
 ret		
 
 
@@ -1394,7 +1493,67 @@ Zombie_behaviour:
 			PATRULHA_ESQ:
 			addi s7, s7, 150
 			j ENEMY_NEXT														
+				
 																						
+#---------------------------------------MORTE-----------------------------------------------------																																							
+	Morte0:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 291
+	li 	a7, 0	
+	addi	t5, t5, 1																								
+	j ENEMY_NEXT																																																										
+																																																																												
+																																																																																														
+	Morte1:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 291
+	li 	a7, 0	
+	addi	t5, t5, 1																								
+	j ENEMY_NEXT																																																																																																																
+																																																																																																																																		
+																																																																																																																																																				
+	Morte2:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 291
+	li 	a7, 0	
+	addi	t5, t5, 1																								
+	j ENEMY_NEXT																																																																																																																																																																						
+																																																																																																																																																																																								
+																																																																																																																																																																																																										
+	Morte3:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 291
+	li 	a7, 0
+	addi	t5, t5, 1																									
+	j ENEMY_NEXT																																																																																																																																																																																																																												
+																																																																																																																																																																																																																																														
+																																																																																																																																																																																																																																																																
+	Morte4:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 291
+	li 	a7, 0	
+	addi	t5, t5, 1																								
+	j ENEMY_NEXT																																																																																																																																																																																																																																																																																		
+																																																																																																																																																																																																																																																																																																				
+																																																																																																																																																																																																																																																																																																																						
+	Morte5:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 291
+	li 	a7, 0
+	addi	t5, t5, 1																								
+	j ENEMY_NEXT																																																																																																																																																																																																																																																																																																																																								
+																																																																																																																																																																																																																																																																																																																																																										
+																																																																																																																																																																																																																																																																																																																																																																												
+	Morte6:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 291
+	li 	a7, 0
+	addi	t5, t5, 1																								
+	j ENEMY_NEXT																																																																																																																																																																																																																																																																																																																																																																																														
+																																																																																																																																																																																																																																																																																																																																																																																																																
+																																																																																																																																																																																																																																																																																																																																																																																																																																		
+																																																																																																																																																																																																																																																																																																																																																																																																																																																				
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																								
 DEATH_INIT:
 li t5, -1
 
@@ -1430,6 +1589,8 @@ li t0, -70
 bge t5, t0, Death13
 li t0, -73
 bge t5, t0, HEART
+li t0, -74
+bge t5, t0, CALICE
 ret
 
 Death0:
@@ -1555,6 +1716,20 @@ Death13:
 		beq t3, t0, DROPA_CORACAO
 		ret																											
 
+CALICE_COLLECT:
+	la 	t0, CALICE_NUM	#Aumenta mana 
+	lb	t1, 0(t0) 
+	addi	t1, t1, 1
+	sb 	t1, (t0)
+	
+
+	
+CALICE:
+	la 	a4, Calice_size
+	li 	a6, 614
+	li 	a7, 503
+	j	ENEMY_NEXT
+	
 
 HEART_COLLECT:
 	la 	t0, MANA	#Aumenta mana 

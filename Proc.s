@@ -394,7 +394,7 @@ li t2, 7
 #beq t1, t2, P7_ENEMIES
 
 li t2, 8
-#beq t1, t2, P8_ENEMIES
+beq t1, t2, P8_ENEMIES
 jr s6
 
 
@@ -445,4 +445,11 @@ jr s6
 			li a1, 2650
 			li a2, 1519
 			call ADD_GHOST
+			jr s6
+			
+			P8_ENEMIES:
+			li a1, 3400
+			li a2, 2100
+			call ADD_CALICE
+			
 			jr s6
