@@ -12,20 +12,24 @@ SHOCKWAVE_SIZE:	.half 15, 48
 
 THORNS_SIZE:	.half 33, 33
 
-SLIME_SIZE:	.half 62, 29
+SLIME_SIZE:	.half 66, 50
 
 BONES_SIZE:	.half 23, 47
 
-MORTE_SIZE:	.half 89, 92
+MORTE_SIZE:	.half 89, 97
 
-
+ORB_SIZE:	.half 36, 36
 
 Death_enemy_size:	.half 32, 32
 Heart_size:		.half 17, 17	
-Calice_size: 	.half 11, 10	
+Calice_size: 		.half 11, 10	
 Ritcher_damaged: 	.byte 0	#(se estiver ferido = 1, caso contrario, 0.)
 Ritcher_IMUNITY:	.byte 0
 
+#Determina se o calice foi pego(0 = ja foi pego n existe mais, 1 = ainda n foi pego)
+Calice1:		.byte   1
+Calice2:		.byte	1
+Calice3:		.byte	1
 
 .text
 .eqv IMUNITY_TIME		15	#15 loops na main	
@@ -40,11 +44,13 @@ Ritcher_IMUNITY:	.byte 0
 .eqv KNIGHT_HP			50
 .eqv SHOCKWAVE_VELOCITY		3
 
-.eqv SLIME_HP			60
+.eqv SLIME_HP			25
 
 .eqv BONES_HP			20
 
-.eqv MORTE_HP			20
+.eqv MORTE_HP			100
+
+.eqv ORB_HP			8
 ###################### ADD_GHOST ###############################
 #	ARGUMENTOS:						#
 #		a1 = posicao x					#
@@ -241,7 +247,7 @@ la t0, QUEUE_ENEMIES
 add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
 addi t0, t0, 4		#Proxima posicao
 li t1, 235
-sw t1, 0(t0)		#Stance primario = 235
+sw t1, 0(t0)		#Stance primario = 236
 addi t0, t0, 4		#Proxima posicao
 li t1, MORTE_HP
 sw t1, 0(t0)		#Vida
@@ -254,6 +260,31 @@ addi t0, t0, 4		#Proxima posicao
 sw a2, 0(t0)		#Armazena posicao y
 addi s10, s10, 20
 ret
+
+###################### ADD_ORB ###############################
+#	ARGUMENTOS:						#
+#		s8 = posicao x					#
+#		s9 = posicao y					#
+#								#
+#								#
+#################################################################
+ADD_ORB:
+la t0, QUEUE_ENEMIES 
+add t0, t0, s10		#soma posicao s10 como a ultima posicao da queue, para colocar proximo enemy no final da queue
+addi t0, t0, 4		#Proxima posicao
+li t3, 376
+sw t3, 0(t0)		#Stance primario = 376
+addi t0, t0, 4		#Proxima posicao
+li t3, ORB_HP
+sw t3, 0(t0)		#Vida
+addi t0, t0, 4		#Proxima posicao
+sw s8, 0(t0)		#Armazena posicao x fixa para movimentação
+addi t0, t0, 4		#Proxima posicao
+sw s8, 0(t0)		#Armazena posicao x
+addi t0, t0, 4		#Proxima posicao
+sw s9, 0(t0)		#Armazena posicao y
+addi s10, s10, 20
+jr s6			#Retorna para s6
 
 ###################### ADD_CALICE ###############################
 #	ARGUMENTOS:						#
@@ -314,12 +345,12 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		#posicao mapa x(s3) <= enemy x(t2) and s3 + screen width >= t2 + enemy_width
 		blt t2, s3, NOT_IN_SCREEN
 		addi t3, s3, SCREEN_WIDTH #t3 = s3 + screen width
-		addi t4, t2, 40
+		addi t4, t2, 25
 		blt t3, t4, NOT_IN_SCREEN
 		#posicao mapa y(s4) <= enemy y(t1) and s4 + screen height >= t1 + enemy height
 		blt t1, s4, NOT_IN_SCREEN
 		addi t3, s4, SCREEN_WIDTH #t3 = s4 + screen height
-		addi t4, t1, 40
+		addi t4, t1, 25
 		blt t3, t4, NOT_IN_SCREEN
 		
 		#Calcular posicao no mapa
@@ -351,7 +382,7 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		li t0, 204
 		bge t0, t5, BONES_HEIGHT
 		
-		li t0, 235
+		li t0, 375
 		bge t0, t5, MORTE_HEIGHT
 		
 		li t0, -72
@@ -452,7 +483,7 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		la 	t0, Shuriken_HITBOX
 		lw 	t3, 0(t0)
 		ble 	t3, t2, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
-		addi 	s6, t2, 35
+		addi 	s6, t2, 30
 		ble 	s6, t3, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
 		
 		lw	t3, 4(t0)
@@ -468,7 +499,7 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		la 	t0, Shuriken_HITBOX
 		lw	t3, 0(t0)
 		ble 	t2, t3, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
-		addi 	s6, t2, -35
+		addi 	s6, t2, -30
 		ble 	t3, s6, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
 		
 		ble 	t2, t3, DAMAGE_BY_ENEMY		#se pos_whip x > enemy x, not in
@@ -496,11 +527,27 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		#Damage
 		addi s5, s5, -1
 		beqz s5, ENEMY_DEAD
-		#la t0, Shuriken_HITBOX
-		#sw zero, 0(t0)
-		#sw zero, 4(t0)
 		
-		
+		#Se for a morte, ao receber dano ativa sua mecanica de se movimentar
+		li t0, 236
+		bge t5, t0, MORTE_DAMAGED		#Se t5 >= 236, necesasriamente siginifica que esta é a morte
+		j END_MORTE_DAMAGED	
+			MORTE_DAMAGED:
+			bne t2, s7, END_MORTE_DAMAGED	#Ainda esta em movimento
+			la t0, PLAYER_POS
+			lw t3, 0(t0)
+			bge t2, t3, MORTE_NEW_POS_DIR		#Se t3 maior que t2, MORTE vai para a direita
+				#Para esquerda
+				addi s7, t2, 320
+				j    END_MORTE_DAMAGED		
+										
+				MORTE_NEW_POS_DIR:	
+				#Para direita
+				addi s7, t2, -320
+			
+				END_MORTE_DAMAGED:
+						
+						
 		la	t0, PLAYER_POS
 		lw 	t3, 0(t0)			
 		bge 	t2, t3, DIR_HITBOX_IMPULSION	#Esta a esquerda
@@ -547,7 +594,7 @@ DAMAGE_BY_ENEMY:
 		li t0, 204
 		bge t0, t5, BONES_HEIGHT2									
 		
-		li t0, 235
+		li t0, 375
 		bge t0, t5, MORTE_HEIGHT2
 																																																																																																														
 		GHOST_HEIGHT2:
@@ -587,9 +634,8 @@ DAMAGE_BY_ENEMY:
 		j DAMAGE_BY_ENEMY_INIT																									
 		
 		MORTE_HEIGHT2:
-		la t0, MORTE_SIZE
-		lh t4, 0(t0)
-		j DAMAGE_BY_ENEMY_INIT							
+		j STANCE_ENEMY	#A morte n causa dano fisico ao player
+								
 																																															
 DAMAGE_BY_ENEMY_INIT:
 	la	t0, PLAYER_POS	
@@ -636,7 +682,7 @@ DAMAGE_BY_ENEMY_INIT:
 		li t0, 204
 		bge t0, t5, BONES_HEIGHT3				
 		
-		li t0, 235
+		li t0, 300
 		bge t0, t5, MORTE_HEIGHT3												
 																																						
 		GHOST_HEIGHT3:
@@ -850,20 +896,62 @@ bge t0, t5, Bones4
 li t0, 234
 bge t0, t5, Bones5
 
-li t0, 240
+li t0, 235
+#bge t0, t5, Lamarzinho
+
+
+li t0, 245
 bge t0, t5, Morte0
-li t0, 244
+li t0, 255
 bge t0, t5, Morte1
-li t0, 248
+li t0, 265
 bge t0, t5, Morte2
 li t0, 252
 bge t0, t5, Morte3
-li t0, 256
+li t0, 275
 bge t0, t5, Morte4
-li t0, 260
+li t0, 285
 bge t0, t5, Morte5
-li t0, 261
+li t0, 295
 bge t0, t5, Morte6
+
+#ATAQUE MORTE(começa em 296)
+li t0, 305
+bge t0, t5, Morte7
+li t0, 315
+bge t0, t5, Morte8
+li t0, 325
+bge t0, t5, Morte9
+li t0, 335
+bge t0, t5, Morte10
+li t0, 345
+bge t0, t5, Morte11
+li t0, 355
+bge t0, t5, Morte12
+li t0, 365
+bge t0, t5, Morte13
+li t0, 375
+bge t0, t5, Morte14
+
+#Power de morte
+li t0, 385
+bge t0, t5, Orb0
+li t0, 395
+bge t0, t5, Orb1
+li t0, 405
+bge t0, t5, Orb2
+li t0, 415
+bge t0, t5, Orb3
+li t0, 425
+bge t0, t5, Orb4
+li t0, 430
+bge t0, t5, Orb5
+li t0, 435
+bge t0, t5, Orb6
+li t0, 440
+bge t0, t5, Orb7
+li t0, 441
+bge t0, t5, Orb8
 ret		
 
 
@@ -1127,13 +1215,13 @@ Zombie_behaviour:
 		
 	Knight0:				
 	la 	a4, KNIGHT_SIZE
-	li  	a6, 7
+	li  	a6, 12
 	li 	a7, 222
 	la	t0, PLAYER_POS
 	lw 	t3, 0(t0)	
 	bge 	t2, t3,  KNIGHT0_J	#Esta a esquerda ritcher
-	li	a6, 1000
-	li 	a7, 222
+	li	a6, 648
+	li 	a7, 218
 		KNIGHT0_J:
 		addi 	t5, t5, 1		#stance
 		j  Knight_behaviour						
@@ -1141,65 +1229,65 @@ Zombie_behaviour:
 										
 	Knight1:				
 	la 	a4, KNIGHT_SIZE
-	li  	a6, 45
+	li  	a6, 61
 	li 	a7, 222
 	la	t0, PLAYER_POS
 	lw 	t3, 0(t0)	
 	bge 	t2, t3,  KNIGHT1_J	#Esta a esquerda ritcher
-	li	a6, 960
-	li 	a7, 222
+	li	a6, 600
+	li 	a7, 218
 		KNIGHT1_J:
 		addi 	t5, t5, 1		#stance
 		j  Knight_behaviour															
 														
 	Knight2:				
 	la 	a4, KNIGHT_SIZE
-	li  	a6, 85
+	li  	a6, 110
 	li 	a7, 222
 	la	t0, PLAYER_POS
 	lw 	t3, 0(t0)	
 	bge 	t2, t3,  KNIGHT2_J	#Esta a esquerda ritcher
-	li	a6, 922
-	li 	a7, 222
+	li	a6, 545
+	li 	a7, 218
 		KNIGHT2_J:
 		addi 	t5, t5, 1		#stance
 		j  Knight_behaviour																			
 																		
 	Knight3:				
 	la 	a4, KNIGHT_SIZE
-	li  	a6, 125
+	li  	a6, 158
 	li 	a7, 222
 	la	t0, PLAYER_POS
 	lw 	t3, 0(t0)	
 	bge 	t2, t3,  KNIGHT3_J	#Esta a esquerda ritcher
-	li	a6, 882
-	li 	a7, 222
+	li	a6, 498
+	li 	a7, 218
 		KNIGHT3_J:
 		addi 	t5, t5, 1		#stance
 		j  Knight_behaviour																				
 																						
 	Knight4:				
 	la 	a4, KNIGHT_SIZE
-	li  	a6, 164
+	li  	a6, 211
 	li 	a7, 222
 	la	t0, PLAYER_POS
 	lw 	t3, 0(t0)	
 	bge 	t2, t3,  KNIGHT4_J	#Esta a esquerda ritcher
-	li	a6, 842
-	li 	a7, 222
+	li	a6, 450
+	li 	a7, 218
 		KNIGHT4_J:
 		addi 	t5, t5, 1		#stance
 		j  Knight_behaviour																									
 	
 	Knight5:				
 	la 	a4, KNIGHT_SIZE
-	li  	a6, 164
+	li  	a6, 211
 	li 	a7, 222
 	la	t0, PLAYER_POS
 	lw 	t3, 0(t0)	
 	bge 	t2, t3,  KNIGHT5_J	#Esta a esquerda ritcher
-	li	a6, 842
-	li 	a7, 222
+	li	a6, 450
+	li 	a7, 218
 		KNIGHT5_J:
 		li 	t5, 73		#stance
 		j 	Knight_behaviour	
@@ -1324,8 +1412,7 @@ Zombie_behaviour:
 	bge t3, t4, KNIGHT_POWER
 	
 	
-	KNIGHT_ATKZ:
-	
+	KNIGHT_ATKZ:	
 	addi 	t2, t2, 1
 	j ENEMY_NEXT
 	KNIGHT_ATKX:
@@ -1399,7 +1486,7 @@ Zombie_behaviour:
 #----------------------------------------SLIME-----------------------------------------------------																
 	SLIME:																				
 	la 	a4, SLIME_SIZE
-	li  	a6, 291
+	li  	a6, 289
 	li 	a7, 0																								
 	j ENEMY_NEXT																													
 																																				
@@ -1498,62 +1585,245 @@ Zombie_behaviour:
 #---------------------------------------MORTE-----------------------------------------------------																																							
 	Morte0:																				
 	la 	a4, MORTE_SIZE
-	li  	a6, 291
-	li 	a7, 0	
+	li  	a6, 98
+	li 	a7, 687	
 	addi	t5, t5, 1																								
-	j ENEMY_NEXT																																																										
+	j 	Morte_behaviour																																																										
 																																																																												
 																																																																																														
 	Morte1:																				
 	la 	a4, MORTE_SIZE
-	li  	a6, 291
-	li 	a7, 0	
+	li  	a6, 187
+	li 	a7, 687
 	addi	t5, t5, 1																								
-	j ENEMY_NEXT																																																																																																																
+	j 	Morte_behaviour																																																																																																																
 																																																																																																																																		
 																																																																																																																																																				
 	Morte2:																				
 	la 	a4, MORTE_SIZE
-	li  	a6, 291
-	li 	a7, 0	
+	li  	a6, 276
+	li 	a7, 687
 	addi	t5, t5, 1																								
-	j ENEMY_NEXT																																																																																																																																																																						
+	j 	Morte_behaviour																																																																																																																																																																						
 																																																																																																																																																																																								
 																																																																																																																																																																																																										
 	Morte3:																				
 	la 	a4, MORTE_SIZE
-	li  	a6, 291
-	li 	a7, 0
+	li  	a6, 365
+	li 	a7, 687
 	addi	t5, t5, 1																									
-	j ENEMY_NEXT																																																																																																																																																																																																																												
+	j 	Morte_behaviour																																																																																																																																																																																																																												
 																																																																																																																																																																																																																																														
 																																																																																																																																																																																																																																																																
 	Morte4:																				
 	la 	a4, MORTE_SIZE
-	li  	a6, 291
-	li 	a7, 0	
+	li  	a6, 454
+	li 	a7, 687	
 	addi	t5, t5, 1																								
-	j ENEMY_NEXT																																																																																																																																																																																																																																																																																		
+	j 	Morte_behaviour																																																																																																																																																																																																																																																																																		
 																																																																																																																																																																																																																																																																																																				
 																																																																																																																																																																																																																																																																																																																						
 	Morte5:																				
 	la 	a4, MORTE_SIZE
-	li  	a6, 291
-	li 	a7, 0
+	li  	a6, 543
+	li 	a7, 687
 	addi	t5, t5, 1																								
-	j ENEMY_NEXT																																																																																																																																																																																																																																																																																																																																								
+	j 	Morte_behaviour																																																																																																																																																																																																																																																																																																																																								
 																																																																																																																																																																																																																																																																																																																																																										
 																																																																																																																																																																																																																																																																																																																																																																												
 	Morte6:																				
 	la 	a4, MORTE_SIZE
-	li  	a6, 291
-	li 	a7, 0
-	addi	t5, t5, 1																								
-	j ENEMY_NEXT																																																																																																																																																																																																																																																																																																																																																																																														
-																																																																																																																																																																																																																																																																																																																																																																																																																
-																																																																																																																																																																																																																																																																																																																																																																																																																																		
-																																																																																																																																																																																																																																																																																																																																																																																																																																																				
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																								
+	li  	a6, 543
+	li 	a7, 687
+	li 	t5, 236																							
+	j 	Morte_behaviour	
+	
+	
+	Morte7:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 14
+	li 	a7, 897
+	addi	t5, t5, 1																						
+	j 	Morte_behaviour																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																											
+	
+	Morte8:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 103
+	li 	a7, 897
+	addi	t5, t5, 1																						
+	j 	Morte_behaviour	
+	
+	Morte9:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 192
+	li 	a7, 897
+	addi	t5, t5, 1																						
+	j 	Morte_behaviour	
+	
+	Morte10:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 281
+	li 	a7, 897
+	addi	t5, t5, 1																						
+	j 	Morte_behaviour	
+	
+	Morte11:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 370
+	li 	a7, 897
+	addi	t5, t5, 1																						
+	j 	Morte_behaviour	
+	
+	Morte12:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 459
+	li 	a7, 897
+	addi	t5, t5, 1																						
+	j 	Morte_behaviour	
+	
+	Morte13:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 548
+	li 	a7, 897
+	addi	t5, t5, 1																						
+	j 	Morte_behaviour	
+	
+	Morte14:																				
+	la 	a4, MORTE_SIZE
+	li  	a6, 548
+	li 	a7, 897
+	li 	t5, 236																						
+	j 	Morte_behaviour	
+	
+	Morte_behaviour:
+	beq t2, s7, MORTE_ATK	#Fica imovel, esta na posição desejada e ataca
+	bge t2, s7, MORTE_TO_ESQ		#Se t2 maior que s7, significa que esta indo para esquerda
+			#Indo para direita
+			addi t2, t2, 4
+			j ENEMY_NEXT
+			MORTE_TO_ESQ:
+			addi t2, t2, -3
+			j ENEMY_NEXT
+	MORTE_ATK:
+	li t0, 326
+	beq t0, t5, ATK_ORBS	#Cast de orbs	
+	li t0, 296	#Se maior que 296, continua o valor
+	bge t5, t0, ENEMY_NEXT
+	li t5, 296				
+	j ENEMY_NEXT																																																																																																																																																																																																																																																																																																																																																																																																																																																			
+	
+	ATK_ORBS:
+	#mv t3, a1 #Guarda valores para funcionamento do procedimento
+	#mv t4, a2
+	
+	mv s8, t2
+	mv s9, t1
+	
+	jal s6, ADD_ORB	
+	
+	#mv a1, t3 #Retorna valores para funcionamento do procedimento
+	#mv a2, t4	
+	j ENEMY_NEXT																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						
+	
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																											
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																					
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																															
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									
+	Orb0:
+	la 	a4, ORB_SIZE
+	li  	a6, 16
+	li 	a7, 812
+	addi 	t5, t5, 1																					
+	j 	Orb_behaviour																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																					
+	
+	Orb1:
+	la 	a4, ORB_SIZE
+	li  	a6, 52
+	li 	a7, 812
+	addi 	t5, t5, 1																					
+	j 	Orb_behaviour	
+	
+	Orb2:
+	la 	a4, ORB_SIZE
+	li  	a6, 88
+	li 	a7, 812
+	addi 	t5, t5, 1																					
+	j 	Orb_behaviour
+	
+	Orb3:
+	la 	a4, ORB_SIZE
+	li  	a6, 124
+	li 	a7, 812
+	addi 	t5, t5, 1																					
+	j 	Orb_behaviour	
+	
+	Orb4:
+	la 	a4, ORB_SIZE
+	li  	a6, 160
+	li 	a7, 812
+	addi 	t5, t5, 1																					
+	j 	Orb_behaviour
+	
+	Orb5:
+	la 	a4, ORB_SIZE
+	li  	a6, 196
+	li 	a7, 812
+	addi 	t5, t5, 1																					
+	j 	Orb_behaviour	
+	
+	Orb6:
+	la 	a4, ORB_SIZE
+	li  	a6, 232
+	li 	a7, 812
+	addi 	t5, t5, 1																					
+	j 	Orb_behaviour		
+	
+	Orb7:
+	la 	a4, ORB_SIZE
+	li  	a6, 268
+	li 	a7, 812
+	addi 	t5, t5, 1																			
+	j 	Orb_behaviour	
+	
+	Orb8:
+	la 	a4, ORB_SIZE
+	li  	a6, 304
+	li 	a7, 812
+	li	t5, 426																					
+	j 	Orb_behaviour	
+	
+	Orb_behaviour:
+	la	t0, PLAYER_POS	
+	lw 	t3, 4(t0)	#se aproxima do y do personagem
+	li 	t4, 1	#Velocidade
+	bge 	t3, t1, ORB_UP	#Esta encima
+	
+	#senao esta abaixo
+	sub 	t1, t1, t4	
+	j  	ORB_X
+	
+	ORB_UP:
+	#senao esta acima
+	add	t1, t1, t4
+	
+	ORB_X:						
+	la	t0, PLAYER_POS					
+	lw 	t3, 0(t0)	#se aproxima do y do personagem
+	beq 	t3, t2, ENEMY_NEXT
+	bge 	t3, t2, ORB_RIGHT	#Esta a direita
+	
+	#senao esta a esquerda
+	sub	t2, t2, t4
+	j 	ENEMY_NEXT
+	ORB_RIGHT:		
+	add 	t2, t2, t4
+	
+	j ENEMY_NEXT
+	
+#---------------------------------------Death enemy-----------------------------------------------------																																																																														
 DEATH_INIT:
 li t5, -1
 
@@ -1721,8 +1991,30 @@ CALICE_COLLECT:
 	lb	t1, 0(t0) 
 	addi	t1, t1, 1
 	sb 	t1, (t0)
+	la 	t0, SETOR
+	lb	t4, 0(t0)
+	li 	t3, 1
+	beq 	t4, t3, CALICE_P1_OFF
+	li 	t3, 4
+	beq 	t4, t3, CALICE_P4_OFF
+	li 	t3, 5
+	beq 	t4, t3, CALICE_P5_OFF
+	j 	CALICE
 	
-
+		CALICE_P1_OFF:
+		la t0, Calice1
+		sb zero, 0(t0)
+		j CALICE	
+	
+		CALICE_P4_OFF:
+		la t0, Calice2
+		sb zero, 0(t0)
+		j CALICE
+		
+		CALICE_P5_OFF:
+		la t0, Calice3
+		sb zero, 0(t0)
+		j CALICE
 	
 CALICE:
 	la 	a4, Calice_size

@@ -382,7 +382,7 @@ li t2, 3
 beq t1, t2, P3_ENEMIES
 
 li t2, 4
-#beq t1, t2, P4_ENEMIES
+beq t1, t2, P4_ENEMIES
 
 li t2, 5
 beq t1, t2, P5_ENEMIES
@@ -400,7 +400,7 @@ jr s6
 
 			P1_ENEMIES:
 			li a1, 690
-			li a2, 450
+			li a2, 454
 			call ADD_THORN
 			
 			li a1, 620
@@ -413,17 +413,112 @@ jr s6
 			#call ADD_GHOST
 			
 			li a1, 550
-			li a2, 970
+			li a2, 966
+			#call ADD_BONES
+			
+			li a1, 550
+			li a2, 955
 			call ADD_BONES
 			
-			li a1, 600
-			li a2, 450
+			li a1, 500
+			li a2, 961
+			call ADD_SLIME
+			
+			li a1, 670
+			li a2, 456
 			call ADD_BONES
 			
 			li a1, 450
 			li a2, 850
 			#call ADD_BONES
+			
+			la t0, Calice1
+			lb t1, 0(t0)
+			beqz, t1, CALICE1_OFF_SETOR
+			li a1, 1140
+			li a2, 956
+			call ADD_CALICE
+			CALICE1_OFF_SETOR:
+			
 			jr s6
+			
+			
+			P4_ENEMIES:
+			
+			li a1, 3400
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3000
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3050
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 2950
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3160
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3100
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3250
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3400
+			li a2, 1460
+			call ADD_GHOST
+			
+			li a1, 3450
+			li a2, 1460
+			call ADD_GHOST
+			
+			li a1, 3350
+			li a2, 1110
+			call ADD_GHOST
+			
+			li a1, 3000
+			li a2, 1460
+			call ADD_GHOST
+			
+			li a1, 2950
+			li a2, 1460
+			call ADD_GHOST
+			
+			li a1, 3000
+			li a2, 1300
+			call ADD_GHOST
+			
+			li a1, 3000
+			li a2, 1350
+			call ADD_GHOST
+			
+			li a1, 3000
+			li a2, 1400
+			call ADD_GHOST
+			
+			li a1, 3000
+			li a2, 1450
+			call ADD_GHOST
+			
+			la t0, Calice2
+			lb t1, 0(t0)
+			beqz, t1, CALICE2_OFF_SETOR
+			li a1, 3147
+			li a2, 1351
+			call ADD_CALICE
+			CALICE2_OFF_SETOR:
+			
+			jr s6
+			
 			
 			
 			P5_ENEMIES:
@@ -435,6 +530,14 @@ jr s6
 			li a2, 360
 			call ADD_KNIGHT
 			
+			la t0, Calice3
+			lb t1, 0(t0)
+			beqz, t1, CALICE3_OFF_SETOR
+			li a1, 4125
+			li a2, 204
+			call ADD_CALICE
+			CALICE3_OFF_SETOR:
+	
 			jr s6
 			
 			P3_ENEMIES:
@@ -449,7 +552,7 @@ jr s6
 			
 			P8_ENEMIES:
 			li a1, 3400
-			li a2, 2100
-			call ADD_CALICE
+			li a2, 2098
+			call ADD_MORTE
 			
 			jr s6
