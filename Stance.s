@@ -840,8 +840,21 @@ ret
 				FLASH_FINAL_POS:
 				sw t3, 0(t2)
 				
-			
-			
+								
+					mv s8, a0
+					mv t3, a1
+					mv t4, a2
+					mv s9, a3
+		SOUND_EFECT_FLASH:	li a0, 68		# pitch
+					li a1, 1000		# duracao
+					li a2, 118		# instrumento
+					li a3, 70		# volume
+					li a7, 31		# define a chamada de syscall
+					ecall
+					mv a0, s8
+					mv a1, t3
+					mv a2, t4	
+					mv a3, s9
 			#Fica estatico no ar
 			fcvt.s.w   fs2, zero
 			fcvt.s.w   fs3, zero

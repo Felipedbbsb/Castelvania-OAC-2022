@@ -82,9 +82,15 @@ Map:				.string 		"./Imagens/MAPA.bin"
 FILE_MAP_SIZE:			.half 4356, 2860	#sempre fazer x += 1(não sei o porque)
 
 
-CALICE_NUM: 			.byte	0		#Começa com 0, ritcher precisa coletar 3
+VICTORY_TELA:			.string 		"./Imagens/Castlevania_Vitoria.bin"
+VICTORY_SIZE:			.half 641, 480		#sempre fazer x += 1(não sei o porque)
+
+
+VICTORY:			.byte 0 		# 0 = nao zerou, 1 = zerou
+
+CALICE_NUM: 			.byte	3		#Começa com 0, ritcher precisa coletar 3
 #--------------------setores------------------------------------------------
-SETOR: 				.byte 8
+SETOR: 				.byte 2
 NEW_SECTOR:			.byte 0
 
 NEW_PLAYER_POS:			.word 380, 900	# posicao nova para proximo loop caso haja transicao

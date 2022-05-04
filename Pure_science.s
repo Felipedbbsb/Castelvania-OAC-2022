@@ -102,8 +102,6 @@ SCIENCE_COLLISION_X:	# Colisao horizontal
 			bnez		t1, SCIENCE_COLLISION_X_L
 			
 			
-			# Colisao vertical
-			#j		PHYSICS.COLL.Y
 			
 
 			ret
@@ -123,7 +121,7 @@ SCIENCE_COLLISION_Y_DOWN:
 			fcvt.s.w	ft5, t1			# ft4 = x offset
 			fadd.s		ft0, ft0, ft5		# ft0 = y + y offset
 			
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
 			fcvt.s.wu	ft0, t1
 			
 			lh 		t1, 0(a2)		#size do setor x
@@ -131,7 +129,7 @@ SCIENCE_COLLISION_Y_DOWN:
 			
 			
 			fmul.s		ft0, ft0, ft4		# ft0 = ft0 * map x
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
 			add		t4, t6, t1		# t4 += t1 + pos hitbox
 			
 			li		t1, 0	
@@ -143,8 +141,8 @@ SCIENCE_COLLISION_Y_DOWN:
 			fcvt.s.w	ft4, t1			# ft4 = hitbox map x
 			fsub.s		ft0, ft0, ft4		# ft0 = x - oofset setor
 			
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
-			fcvt.s.wu	ft0, t1			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
+			fcvt.s.wu	ft0, t1			
 			
 			add		t2, t4, t1		# t2 = pos y + posx (with offset)
 			
@@ -196,7 +194,7 @@ SCIENCE_COLLISION_Y_UP:
 			fsub.s 		ft0, ft0, ft4		#subtrai posicao do setor para determinar posicao do player dentro do setor
 			
 			
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
 			fcvt.s.wu	ft0, t1
 			
 			lh 		t1, 0(a2)		#size do setor x
@@ -204,7 +202,7 @@ SCIENCE_COLLISION_Y_UP:
 			
 			
 			fmul.s		ft0, ft0, ft4		# ft0 = ft0 * map x
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
 			add		t4, t6, t1		# t4 += t1 + pos hitbox
 			
 			li		t1, 0	
@@ -216,8 +214,8 @@ SCIENCE_COLLISION_Y_UP:
 			fcvt.s.w	ft4, t1			# ft4 = hitbox map x
 			fsub.s		ft0, ft0, ft4		# ft0 = x - oofset setor
 			
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
-			fcvt.s.wu	ft0, t1			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
+			fcvt.s.wu	ft0, t1			
 			
 			add		t2, t4, t1		# t2 = pos y + posx (with offset)
 
@@ -258,7 +256,7 @@ SCIENCE_COLLISION_X_R:
 			fsub.s 		ft0, ft0, ft4		#subtrai posicao do setor para determinar posicao do player dentro do setor
 			
 			
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
 			fcvt.s.wu	ft0, t1
 			
 			lh 		t1, 0(a2)		#size do setor x
@@ -266,7 +264,7 @@ SCIENCE_COLLISION_X_R:
 			
 			
 			fmul.s		ft0, ft0, ft4		# ft0 = ft0 * map x
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
 			add		t4, t6, t1		# t4 += t1 + pos hitbox
 			
 			li		t1, PLAYER_WIDTH	
@@ -278,8 +276,8 @@ SCIENCE_COLLISION_X_R:
 			fcvt.s.w	ft4, t1			# ft4 = hitbox map x
 			fsub.s		ft0, ft0, ft4		# ft0 = x - oofset setor
 			
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
-			fcvt.s.wu	ft0, t1			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
+			fcvt.s.wu	ft0, t1			
 			
 			add		t2, t4, t1		# t2 = pos y + posx (with offset)
 			
@@ -305,7 +303,7 @@ SCIENCE_COLLISION_X_R:
 			lh 		t1, 0(a2)		# size do setor x
 			fcvt.s.w	ft3, t1			# ft3 = hitbox map x
 			fmul.s		ft2, ft3, ft4		# ft2 = ft3 * map x
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft2			
 			add		t2, t2, t1		# t4 += t1 + pos hitbox
 			#------------------------1/4 do personagem----------------------------------------------------------------------
 			lbu		t1, 0(t2)
@@ -333,7 +331,7 @@ SCIENCE_COLLISION_X_R:
 			lh 		t1, 0(a2)		# size do setor x
 			fcvt.s.w	ft3, t1			# ft3 = hitbox map x
 			fmul.s		ft2, ft3, ft4		# ft2 = ft3 * map x
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft2			
 			add		t2, t2, t1		# t4 += t1 + pos hitbox
 			#------------------------3/4 do personagem----------------------------------------------------------------------
 			lbu		t1, 0(t2)
@@ -347,7 +345,7 @@ SCIENCE_COLLISION_X_R:
 			lh 		t1, 0(a2)		# size do setor x
 			fcvt.s.w	ft3, t1			# ft3 = hitbox map x
 			fmul.s		ft2, ft3, ft4		# ft2 = ft3 * map x
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft2			
 			add		t2, t2, t1		# t4 += t1 + pos hitbox
 			#------------------------4/4 do personagem----------------------------------------------------------------------
 			lbu		t1, 0(t2)
@@ -366,7 +364,7 @@ SCIENCE_COLLISION_X_L:	fadd.s		ft0, ft0, ft7		# ft0 = y
 			fsub.s 		ft0, ft0, ft4		#subtrai posicao do setor para determinar posicao do player dentro do setor
 			
 			
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
 			fcvt.s.wu	ft0, t1
 			
 			lh 		t1, 0(a2)		#size do setor x
@@ -374,7 +372,7 @@ SCIENCE_COLLISION_X_L:	fadd.s		ft0, ft0, ft7		# ft0 = y
 			
 			
 			fmul.s		ft0, ft0, ft4		# ft0 = ft0 * map x
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
 			add		t4, t6, t1		# t4 += t1 + pos hitbox
 			
 			li		t1, 0
@@ -386,8 +384,8 @@ SCIENCE_COLLISION_X_L:	fadd.s		ft0, ft0, ft7		# ft0 = y
 			fcvt.s.w	ft4, t1			# ft4 = hitbox map x
 			fsub.s		ft0, ft0, ft4		# ft0 = x - oofset setor
 			
-			fcvt.wu.s	t1, ft0			# t1 = floor(ft0)
-			fcvt.s.wu	ft0, t1			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft0			
+			fcvt.s.wu	ft0, t1			
 			
 			add		t2, t4, t1		# t2 = pos y + posx (with offset)
 			
@@ -413,7 +411,7 @@ SCIENCE_COLLISION_X_L:	fadd.s		ft0, ft0, ft7		# ft0 = y
 			lh 		t1, 0(a2)		# size do setor x
 			fcvt.s.w	ft3, t1			# ft3 = hitbox map x
 			fmul.s		ft2, ft3, ft4		# ft2 = ft3 * map x
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft2			
 			add		t2, t2, t1		# t4 += t1 + pos hitbox
 			#------------------------1/4 do personagem----------------------------------------------------------------------
 			lbu		t1, 0(t2)
@@ -427,7 +425,7 @@ SCIENCE_COLLISION_X_L:	fadd.s		ft0, ft0, ft7		# ft0 = y
 			lh 		t1, 0(a2)		# size do setor x
 			fcvt.s.w	ft3, t1			# ft3 = hitbox map x
 			fmul.s		ft2, ft3, ft4		# ft2 = ft3 * map x
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft2			
 			add		t2, t2, t1		# t4 += t1 + pos hitbox
 			#------------------------2/4 do personagem----------------------------------------------------------------------
 			lbu		t1, 0(t2)
@@ -441,7 +439,7 @@ SCIENCE_COLLISION_X_L:	fadd.s		ft0, ft0, ft7		# ft0 = y
 			lh 		t1, 0(a2)		# size do setor x
 			fcvt.s.w	ft3, t1			# ft3 = hitbox map x
 			fmul.s		ft2, ft3, ft4		# ft2 = ft3 * map x
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft2			
 			add		t2, t2, t1		# t4 += t1 + pos hitbox
 			#------------------------3/4 do personagem----------------------------------------------------------------------
 			lbu		t1, 0(t2)
@@ -455,7 +453,7 @@ SCIENCE_COLLISION_X_L:	fadd.s		ft0, ft0, ft7		# ft0 = y
 			lh 		t1, 0(a2)		# size do setor x
 			fcvt.s.w	ft3, t1			# ft3 = hitbox map x
 			fmul.s		ft2, ft3, ft4		# ft2 = ft3 * map x
-			fcvt.wu.s	t1, ft2			# t1 = floor(ft0)
+			fcvt.wu.s	t1, ft2			
 			add		t2, t2, t1		# t4 += t1 + pos hitbox
 			#------------------------4/4 do personagem----------------------------------------------------------------------
 			lbu		t1, 0(t2)

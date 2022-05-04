@@ -5,29 +5,19 @@
 .data 
 
 #PLAYER_POS:	.word 450, 900	# posicao atual do player/inicial
-PLAYER_POS:	.word 3200 , 2800	# posicao atual do player/inicial
+PLAYER_POS:	.word 3080 , 1555	# posicao atual do player/inicial
 PLAYER_SIZE:	.half 30,48	#tamanho do Ritcher
 
 
 
-#CHAR_POS:	.float 704, 648
 
-#RESPAWN_POS:	.half 704, 648	# respawn pos (x, y)
 
 
 
 
 .text
 
-# Registradores que devem permanecer inalterados
-#
-# s0 = Map
-# s1 = frame
-# s3 = mapa x
-# s4 = mapa y
 
-#s10 = enemies generator time
-#s11 = frame control
 
 
 # Open MAPA file	
@@ -37,7 +27,7 @@ PLAYER_SIZE:	.half 30,48	#tamanho do Ritcher
 			#sw	s10,1480(sp)
 			#update s10
 			#addi	s10,sp,1480	
-			
+START:			
 			la		t0, PLAYER_POS
 			flw		fs0, 0(t0)		# fs0 = char x
 			flw		fs1, 4(t0)		# fs1 = char y
@@ -87,7 +77,9 @@ MAIN_LOOP:		# O framerate de 60 fps
 			mul a0, a0, t1
 			NO_RUN:
 			
-			
+			la t0, HP
+			lb t1, 0(t0)
+			beq t1, zero, THE_END2
 
 			
 			#Soma as posicoes novas da KEY
@@ -327,12 +319,12 @@ HUD:
 	#imprime barra de vida
 	li s6, 0 #valor inicial pro loop
 	la t3, HP 
-	lb t3, 0(t3) #t3=HP
+	lb t3, 0(t3) 	#t3=HP
 	la t4, BARRA_HP_size
-	lh t4, 2(t4) #t4=altura da BARRA_HP
+	lh t4, 2(t4) 	#t4=altura da BARRA_HP
 	
 	IMPRIME_BARRA_HP:
-	bge s6, t3, FIM_MAIN_LOOP
+	bge s6, t3, DIALOGO_PRINT
 	
 	call BARRA_HP
 	mul t0, s6, t4
@@ -345,23 +337,34 @@ HUD:
 																					
 																																										
 DIALOGO_PRINT:
+	la t0, DIALOGO_STANCE
+	lh t5, 0(t0)
+	beqz t5, NO_CHAT
+	
 	li a7, 1024
 	la a0, dialogos
 	li a1, 0											
 	ecall																																																															
 																																																																																				
 	call DIALOGO
-	beq a7, zero, NO_PRINT_CHAT
 	li a1, 0
 	li a2, 0
 	la a3, DIALOGOS_SIZE
-	la a4, Box_size
+	la a4, BOX_SIZE
 	mv a5, s1
-	
-	call PRINT																																																																																																																																																																																																														
-																																																																																																																														
-																																																																																																																																																			
-NO_PRINT_CHAT:																																																																																																																																																																								
+	call PRINT
+																																																																																																																																																																																																															
+	la t0, DIALOGO_STANCE
+	lh t5, 0(t0)
+	li t1, -2																																																																																																																													
+	beq t1, t5, BOSS
+	j NO_CHAT
+BOSS:
+li a1, 3375
+li a2, 2050
+call ADD_MORTE
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																												
+NO_CHAT:																																																																																																																																																																								
 																																																																																																																																																																																													
 																																																																																																																																																																																																																		
 																																																																																																																																																																																																																																							
@@ -373,8 +376,13 @@ li		t1, 22			#24ms
 bltu		t0, t1, FIM_MAIN_LOOP
 					
 
+#Confere se zerou o jogo (ultimo dialogo e estar no setor 8)
+la t0, VICTORY
+lb t1, 0(t0)
+beq t1, zero, NOT_THEEND
+j THE_END
 
-
+NOT_THEEND:
 
 call SWITCH_FRAME		#mostra a nova tela	
 beq s1, zero,FRAME_1
@@ -394,7 +402,7 @@ csrr		s11, 3073	#tempo do primeiro frame
 la t0, NEW_SECTOR
 lb t1, 0(t0)
 beqz t1, MAIN_LOOP
-#j MAIN_LOOP1
+
 #Novos valores de setor e posicao player
 la t2, SETOR
 lb t1, 0(t0) 
@@ -415,10 +423,40 @@ sw t1, 4(t0)
 j MAIN_ENEMIES
 
 
+			THE_END:	#Vitoria
+			li	a7, 1024
+			la	a0, VICTORY_TELA
+			li	a1, 0
+			ecall
+			li a6, 0
+			li a7, 0
+			
+			LOOP_VICTORY:
+			li a1, 0
+			li a2, 0
+			li a3, VICTORY_SIZE
+			li a4, SCREEN_SIZE
+			mv a5, s1
+			call PRINT
+			
+			li t1, 290
+			beq t1, a6, FINISH
+			addi a6, a6, 1
+			J2:
+			li t1, 237
+			beq t1, a6, J3
+			addi a6, a6, 1
+			J3:
+			
+			j LOOP_VICTORY
+			
+THE_END2:	#Derrota
+li a0, 5000
+li a7, 32
+ecall
 
-
-
-li a7,10
+FINISH:
+li a7, 10
 ecall
 
 #Procedimentos

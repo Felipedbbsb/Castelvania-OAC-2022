@@ -549,6 +549,19 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		beq t0, t5, DAMAGE_BY_ENEMY
 		li t0, -1
 		bge t0, t5, DEATH_ENEMY
+		
+					mv s8, a0
+					mv t3, a1
+					mv t4, a2
+		SOUND_EFECT_BATE:	li a0, 60		# pitch
+					li a1, 150		# duracao
+					li a2, 102		# instrumento
+					li a3, 70		# volume
+					li a7, 31		# define a chamada de syscall
+					ecall
+					mv a0, s8
+					mv a1, t3
+					mv a2, t4
 		#Damage
 		addi s5, s5, -1
 		beqz s5, ENEMY_DEAD
@@ -584,6 +597,17 @@ ENEMIES:	la t0, QUEUE_ENEMIES
 		j DAMAGE_BY_ENEMY
 		
 		ENEMY_DEAD:
+		#Confere se foi a morte que morreu
+		li t3, 234
+		bge t3, t5 , NOT_BOSS
+		li t3, 376
+		bge t5, t3, NOT_BOSS
+		
+		la t0, VICTORY
+		li t3, 1
+		sb t3, 0(t0)
+		
+		NOT_BOSS:
 		bge t5, zero, DEATH_INIT
 		j DEATH_ENEMY
 		
@@ -777,13 +801,35 @@ li t0, -71
 beq t0, t5, HEART_COLLECT
 li t0, -74
 beq t0, t5, CALICE_COLLECT
+li t0, -75
+beq t0, t5, LAMAR_COLLECT
 li t4, -1
 bge t4, t5, DEATH_ENEMY
 
 la t0, Ritcher_IMUNITY	
 lb t3, 0(t0)
 bnez t3, STANCE_ENEMY		#NO damage pq esta imune		
+	
 				
+							
+					mv s8, a0
+					mv t3, a1
+					mv t4, a2
+		SOUND_EFECT_APANHA:	li a0, 68		# pitch
+					li a1, 150		# duracao
+					li a2, 103		# instrumento
+					li a3, 70		# volume
+					li a7, 31		# define a chamada de syscall
+					ecall
+					mv a0, s8
+					mv a1, t3
+					mv a2, t4										
+													
+																
+																			
+																						
+																									
+																															
 la 	t0, HP
 lb 	t3, 0(t0)	
 addi 	t3, t3, -1
@@ -803,6 +849,8 @@ li t0, -71
 beq t0, t5, HEART_COLLECT
 li t0, -74
 beq t0, t5, CALICE_COLLECT
+li t0, -75
+beq t0, t5, LAMAR_COLLECT
 li t4, -1
 bge t4, t5, DEATH_ENEMY
 
@@ -810,7 +858,20 @@ bge t4, t5, DEATH_ENEMY
 la t0, Ritcher_IMUNITY	
 lb t3, 0(t0)
 bnez t3, STANCE_ENEMY		#NO damage pq esta imune		
-
+			
+					mv s8, a0
+					mv t3, a1
+					mv t4, a2
+				
+		SOUND_EFECT_APANHA2:	li a0, 68		# pitch
+					li a1, 150		# duracao
+					li a2, 103		# instrumento
+					li a3, 70		# volume
+					li a7, 31		# define a chamada de syscall
+					ecall
+					mv a0, s8
+					mv a1, t3
+					mv a2, t4
 
 la 	t0, HP
 lb 	t3, 0(t0)	
@@ -2009,24 +2070,24 @@ Death13:
 		beq t3, t0, DROPA_CORACAO
 		ret																											
 
-LAMARZINHO_COLLECT:
+LAMAR_COLLECT:
 la 	t0, SETOR
-lb	t4, 0(t0)
-li 	t3, 1
-beq 	t4, t3, DIALOGO_P1
+lb	t1, 0(t0)
+li 	t3, 2
+beq 	t1, t3, DIALOGO_P2
 li 	t3, 8
-beq 	t4, t3, DIALOGO_P8
+beq 	t1, t3, DIALOGO_P8
 j 	LAMARZINHO
 
-	DIALOGO_P1:
+	DIALOGO_P2:
 	la 	t0, DIALOGO_STANCE
 	li 	t3, 1
-	sh 	t3, 0(t0)	
+	sh 	t3, 0(t0)
 	j 	LAMARZINHO
 	
 	DIALOGO_P8:
 	la 	t0, DIALOGO_STANCE
-	li 	t3, 1
+	li 	t3, 752
 	sh 	t3, 0(t0)	
 	j 	LAMARZINHO
 
@@ -2038,6 +2099,19 @@ LAMARZINHO:
 
 
 CALICE_COLLECT:
+	mv s8, a0
+	mv t3, a1
+	mv t4, a2
+	SOUND_EFECT_CALICE:	li a0, 96		# pitch
+				li a1, 900		# duracao
+				li a2, 98		# instrumento
+				li a3, 70		# volume
+				li a7, 31		# define a chamada de syscall
+				ecall
+	mv a0, s8
+	mv a1, t3
+	mv a2, t4
+	
 	la 	t0, CALICE_NUM	#Aumenta mana 
 	lb	t1, 0(t0) 
 	addi	t1, t1, 1

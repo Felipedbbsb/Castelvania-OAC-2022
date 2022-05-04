@@ -376,7 +376,7 @@ li t2, 1
 beq t1, t2, P1_ENEMIES
 
 li t2, 2
-#beq t1, t2, P2_ENEMIES
+beq t1, t2, P2_ENEMIES
 
 li t2, 3
 beq t1, t2, P3_ENEMIES
@@ -442,6 +442,11 @@ jr s6
 			
 			jr s6
 			
+			P2_ENEMIES:
+			li a1, 3448
+			li a2, 1567
+			call ADD_LAMARZINHO
+			jr s6
 			
 			P4_ENEMIES:
 			
@@ -551,8 +556,9 @@ jr s6
 			jr s6
 			
 			P8_ENEMIES:
-			li a1, 3375
-			li a2, 2050
-			call ADD_MORTE
+			
+			li a1, 3702
+			li a2, 2111
+			call ADD_LAMARZINHO
 			
 			jr s6

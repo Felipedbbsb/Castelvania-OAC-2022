@@ -5,7 +5,7 @@ POWER_size:		.half 14, 14
 NUMERO_size:		.half 8, 7
 HP:			.byte 15
 POWER:			.byte 1	#0 = shuriken selecionado, 1 = flash selecionado)
-MANA:			.byte 13
+MANA:			.byte 20
 .text
 .eqv SHURIKEN_COST	3
 .eqv FLASH_COST		7
