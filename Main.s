@@ -57,13 +57,13 @@ MAIN_LOOP:		# O framerate de 60 fps
 			li		t1, 0		# 16ms 
 			bltu		t0, t1, MAIN_LOOP	
 
-			call		MUSIC.PLAY
+			#call		MUSIC.PLAY
 			
 
 			call 	KEY	#verifica teclado
 			call    GRAVITY	#SE no ar, aumenta a velocidade da gravidade
 			
-			#Confere se est· correndo para aumentar velocidade
+			#Confere se est√° correndo para aumentar velocidade
 			la t0, RUNNING
 			lb t1, 0(t0)
 			beq t1, zero, NO_RUN	#Se igual a zero, nao esta correndo
@@ -262,7 +262,7 @@ SHURIKEN_ATK:
 	ecall
 	call WEAPON_POS
 	call SHURIKEN_T
-	ble a1, zero, HUD #Esta fora da tela, n È necessario print
+	ble a1, zero, HUD #Esta fora da tela, n √© necessario print
 	la a3, Pocket_size
 	la a4, SHURIKEN_size
 	mv a5, s1
