@@ -1,4 +1,4 @@
-# Castelvania-OAC-2022
+# Castlevania-OAC-2022
 
 <p align="center">Implementação de Castelvania para o projeto final da disciplina de OAC. Programado em Assembly Risk-V
 
